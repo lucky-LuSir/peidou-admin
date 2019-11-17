@@ -1,0 +1,124 @@
+/** 此为公共样式 */
+html,
+body {
+  overflow: hidden;
+  width: 100vw;
+}
+.com-header {
+  height: 60px;
+  line-height: 60px;
+  border-bottom: 1px solid #ccc;
+  padding-left: 20px;
+}
+.com-header h2 {
+  color: #000;
+  font-size: 20px;
+  font-weight: 600;
+  width: 500px;
+  float: left;
+  text-align: left;
+  padding-left: 10px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.com-search-list {
+  margin-left: 10px;
+  text-align: left;
+  padding: 20px 0 10px 20px;
+}
+.com-search-list .label {
+  margin-right: 20px;
+}
+.com-search-list .el-button {
+  margin-left: 40px;
+  background: #019794;
+  color: #fff;
+  font-size: 14px;
+  padding: 6px 15px;
+}
+.com-search-list .el-icon-font-sousuo {
+  font-size: 18px;
+  vertical-align: text-top;
+}
+.com-addBtn-list {
+  text-align: left;
+  margin-top: 25px;
+  padding-left: 30px;
+  margin-bottom: 20px;
+}
+.comInfo-top {
+  margin-top: 50px;
+}
+.comInfo-top h2 {
+  text-align: left;
+  color: #333;
+  font-weight: 700;
+  font-size: 16px;
+}
+.comInfo-content {
+  text-align: left;
+  padding-top: 20px;
+  display: flex;
+  align-items: center;
+}
+.comInfo-content .inline {
+  display: flex;
+  align-items: center;
+}
+.com-floor-btns {
+  display: block;
+}
+._label14 {
+  color: #313131;
+  font-weight: 600;
+}
+._labelW100 {
+  width: 100px;
+  color: #676a6c;
+}
+._labelW90 {
+  width: 90px;
+  color: #676a6c;
+}
+._labelW80 {
+  width: 80px;
+  color: #676a6c;
+}
+._width280 {
+  width: 280px;
+}
+._ml20 {
+  margin-left: 20px;
+}
+._btn32 {
+  padding: 6px 15px;
+  color: #fff;
+  font-size: 14px;
+  height: 32px;
+}
+.el-table th {
+  font-weight: 600;
+  color: #333;
+}
+.el-icon-font-sousuo {
+  vertical-align: text-top;
+  font-size: 18px;
+}
+/* 滚动条的宽度 */
+::-webkit-scrollbar {
+  width: 0px;
+  height: 8px;
+  z-index: 99999;
+}
+.root::-webkit-scrollbar {
+  width: 8px;
+}
+/* 滚动条的滑块 */
+::-webkit-scrollbar-thumb {
+  background-color: #dee1e6;
+  border-radius: 3px;
+  z-index: 99999;
+}
+.card_id_list {
+  margin-bottom: 20px;
+}

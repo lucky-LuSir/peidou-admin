@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.js"></script>
+    <title>Title</title>
+</head>
+<script>
+    window.onload = function() {
+        new Vue({
+            el: "#app",
+            data: {
+                //商品数据
+                goods: [
+                    {
+                        id: 1,
+                        name: '【详情页领券！到手价2099元起】Xiaomi/小米小米8年度旗舰全面屏骁',
+                        price: 2299.00,
+                        num: 1
+                    },
+                    {
+                        id: 2,
+                        name: '【4+64G低至1299】Xiaomi/小米 小米8 青春版全面屏智能拍照游戏手机',
+                        price: 1299.00,
+                        num: 1
+                    },
+                    {
+                        id: 3,
+                        name: '【爆款钜惠】Xiaomi/小米 6X智能AI双摄拍照学生老人青春手机小米8官方',
+                        price: 1299.00,
+                        num: 1
+                    },
+                    {
+                        id: 4,
+                        name: '领券128G低至2429起/送手环现货Xiaomi/小米 小米8 手机正品官方旗舰',
+                        price: 2159.00,
+                        num: 1
+                    },
+                    {
+                        id: 5,
+                        name: '【直降150领券再减50】Huawei/华为 畅享 8e 青春版 4G高清全面屏大屏全',
+                        price: 649.00,
+                        num: 1
+                    },
+                    {
+                        id: 6,
+                        name: 'Huawei/华为 nova 4 自拍极点全面屏超广角三摄正品智能易烊千玺代言手',
+                        price: 3099.00,
+                        num: 1
+                    },
+                    {
+                        id: 7,
+                        name: '【12期分期/顺丰速发/送壕礼】Huawei/华为 Mate 20 Pro中移动手机',
+                        price: 5399.00,
+                        num: 1
+                    },
+                    {
+                        id: 8,
+                        name: '直降700当天发Huawei/华为 Mate 20 Pro保时捷手机降价mate20proX',
+                        price: 3488.00,
+                        num: 1
+                    },
+                    {
+                        id: 9,
+                        name: 'Huawei/华为 P20 Pro全网通128g徕卡三摄全面屏6G运存手机正品64g',
+                        price: 2698.00,
+                        num: 1
+                    },
+                    {
+                        id: 10,
+                        name: 'Huawei/华为 Mate 20 Pro翡冷翠璨星蓝mate20proUD手机馥蕾红现货',
+                        price: 5488.00,
+                        num: 1
+                    },
+                    {
+                        id: 11,
+                        name: '【6期免息 赠一年碎屏险 】OPPO R17全面屏拍照手机AI智能屏幕指纹',
+                        price: 2799.00,
+                        num: 1
+                    }
+                ],
+                //控制全选
+                allChecked: true,
+                //存放被选择的数据
+                allSelectedGoods: []
+            },
+            methods: {
+                //删除购物车元素
+                //删除是一定也要记得从allSelectGoods数组中删除对应的id
+                del(k) {
+                    if (!confirm("确认删除吗")) {
+                        window.event.returnValue = false;
+                    } else {
+                        //如果该条信息已被选中
+                        if (this.allSelectedGoods.indexOf(this.goods[k].id) !== -1) {
+                            var index = this.allSelectedGoods.indexOf(this.goods[k].id);
+                            this.allSelectedGoods.splice(index, 1);
+                        }
+                        this.goods.splice(k, 1);
+                        console.log(this.allSelectedGoods)
+                    }
+                },
+                //增减数量
+                changeNum(k, num, type) {
+                    //如果是减少，要判断>1，最少是1
+                    if (type === -1) {
+                        if (this.goods[k].num > 1) {
+                            this.goods[k].num = this.goods[k].num + type;
+                        }
+                    } else {
+                        this.goods[k].num = this.goods[k].num + type;
+                    }
+                },
+                //点击全选按钮
+                selectAll() {
+                    //event.currentTarget.checked表示点击完后该选择框的状态
+                    if (!event.currentTarget.checked) {
+                        this.allSelectedGoods = [];
+                    } else {
+                        this
+                            .allSelectedGoods = []; //先置空，然后再重新添加，不然数组里会有重复！因为有可能点击全选之前已经选择了几个单选按钮。也就是数组里已经添加过了对应的id。
+                        this.goods.forEach((v, k) => {
+                            this.allSelectedGoods.push(v.id)
+                        })
+                    }
+                    console.log(this.allSelectedGoods)
+                },
+                //点击单选按钮
+                selectSingle(k) {
+                    if (event.currentTarget.checked) {
+                        this.allSelectedGoods.push(this.goods[k].id)
+                    } else {
+                        for (var i = 0; i < this.allSelectedGoods.length; i++) {
+                            if (this.goods[k].id === this.allSelectedGoods[i]) {
+                                this.allSelectedGoods.splice(i, 1);
+                                this.allChecked = false;
+                                break;
+                            }
+                        }
+                    }
+                    console.log(this.allSelectedGoods)
+                },
+                //批量删除
+                delSelect() {
+                    if (confirm("确认删除" + this.allSelectedGoods.length + "条信息吗？")) {
+                        for (var i = this.goods.length - 1; i >= 0; i--) {
+                            if (this.allSelectedGoods.indexOf(this.goods[i].id) !== -1) {
+                                // 从allSelectedGoods数组中也需要删除
+                                var index = this.allSelectedGoods.indexOf(this.goods[i].id);
+                                this.allSelectedGoods.splice(index, 1);
+                                // 删除goods数组中的信息
+                                // var index = this.goods.indexOf(v.id);
+                                this.goods.splice(i, 1);
+                            }
+                        }
+                        //这种写法是错误的，因为数组每次删除一条数据以后索引
+                        // 值会发生变化，所以用上述的倒叙删除，先删除索引大的数据
+                        /* this.goods.forEach((v, k) => {
+                             if (this.allSelectedGoods.indexOf(v.id)!==-1) {
+                             //从allSelectedGoods数组中也需要删除
+                                 var index = this.allSelectedGoods.indexOf(this.goods[k].id);
+                                 this.allSelectedGoods.splice(index,1);
+                             //删除goods数组中的信息
+                                /!*var index = this.goods.indexOf(v.id);*!/
+                                console.log(k);
+                                 this.goods.splice(k,1);
+                             }
+                         });*/
+                    }
+                    console.log(this.allSelectedGoods)
+                }
+            },
+            computed: {
+                //totalPrice计算总价
+                totalPrice() {
+                    var totalprice = 0;
+                    //未加入选择框时的计算总价
+                    //方法一
+                    // for(var i=0;i<this.goods.length;i++){
+                    //     totalprice += this.goods[i].num*this.goods[i].price
+                    // }
+                    //方法二
+                    // this.goods.forEach((v, k) => {
+                    //     totalprice += v.num * v.price;
+                    // });
+
+
+                    //加入选择框以后的计算总价
+                    this.goods.forEach((v, k) => {
+                        if (this.allSelectedGoods.indexOf(v.id) !== -1) {
+                            console.log(v.price)
+                            totalprice += v.price * v.num;
+                        }
+                    });
+                    return totalprice;
+                },
+            }
+        })
+    }
+</script>
+
+<body>
+    <div class="container" id="app">
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">购物车</div>
+                    <div style="text-align: right">
+                        <button type="button" class="btn btn-danger" @click="delSelect()">批量删除</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" @click="selectAll()" :checked="goods.length===allSelectedGoods.length&&goods.length"></th>
+                                <th>商品名称</th>
+                                <th>商品单价</th>
+                                <th>购买数量</th>
+                                <th>小计</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+
+                        <tr v-for="(v,k) in goods" v-show="goods.length!==0">
+                            <td><input type="checkbox" @click="selectSingle(k)" :checked="allSelectedGoods.indexOf(v.id)>=0"></td>
+                            <td>{{v.name}}</td>
+                            <td>￥{{v.price}}</td>
+                            <td>
+                                <button type="button" style="width:25px;text-align: center" @click="changeNum(k,v.num,-1)">
+                                    -
+                                </button>
+                                <input type="text" v-model="v.num" style="width:25px;text-align: center">
+                                <button type="button" style="width:25px;text-align: center" @click="changeNum(k,v.num,1)">
+                                    +
+                                </button>
+                            </td>
+                            <td>{{v.num*v.price}}</td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-xs" @click="del(k)">删除</button>
+                            </td>
+                        </tr>
+                    </table>
+                    <span v-show="goods.length===0" style="text-align: center">
+                        <h1>购物车为空</h1>
+                    </span>
+                </div>
+                <div class="panel-footer" style="text-align:right">
+                    共计￥<span>{{totalPrice}}</span>元
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
