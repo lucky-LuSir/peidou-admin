@@ -1,0 +1,73 @@
+{
+    "result": [{
+            "id": 1,
+            "item": "homeManager",
+            "level": 1,
+            "menuName": "首页",
+            "menuType": "1",
+            "children": [],
+            "code": "1"
+        },
+        {
+            "id": 2,
+            "item": "storeMan",
+            "level": 1,
+            "menuName": "门店管理",
+            "menuType": "1",
+            "code": "2",
+            "children": [{
+                "id": 20,
+                "item": "",
+                "level": 2,
+                "menuName": "门店管理",
+                "menuType": "1",
+                "code": "20",
+                "children": []
+            }]
+        },
+        {
+            "id": 3,
+            "item": "quoteMan",
+            "level": 1,
+            "menuName": "询价采购管理",
+            "menuType": "1",
+            "code": "3",
+            "children": [{
+                    "id": 30,
+                    "item": "quoteList",
+                    "level": 2,
+                    "menuName": "询价报价",
+                    "menuType": "1",
+                    "code": "30",
+                    "children": []
+                },
+                {
+                    "id": 32,
+                    "item": "purchaseOrderList",
+                    "level": 2,
+                    "code": "32",
+                    "menuName": "采购订单",
+                    "menuType": "1",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "item": "storeMan",
+            "level": 1,
+            "menuName": "供应商管理",
+            "menuType": "1",
+            "code": "4",
+            "children": [{
+                "id": 40,
+                "item": "",
+                "level": 2,
+                "menuName": "供应商管理",
+                "menuType": "1",
+                "code": "40",
+                "children": []
+            }]
+        }
+    ]
+}

@@ -1,0 +1,79 @@
+{
+  "id": "1471338",
+  "name": "maocongwang",
+  "font_family": "fontFamily",
+  "css_prefix_text": "el-icon-font-",
+  "description": "vue+element",
+  "glyphs": [
+    {
+      "icon_id": "551267",
+      "name": "财务",
+      "font_class": "caiwu",
+      "unicode": "e60f",
+      "unicode_decimal": 58895
+    },
+    {
+      "icon_id": "704753",
+      "name": "table-large",
+      "font_class": "tablelarge",
+      "unicode": "eada",
+      "unicode_decimal": 60122
+    },
+    {
+      "icon_id": "1247400",
+      "name": "下拉",
+      "font_class": "xiala",
+      "unicode": "e656",
+      "unicode_decimal": 58966
+    },
+    {
+      "icon_id": "4360990",
+      "name": "首页",
+      "font_class": "shouye",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "4700542",
+      "name": "权限",
+      "font_class": "authority",
+      "unicode": "e623",
+      "unicode_decimal": 58915
+    },
+    {
+      "icon_id": "5328274",
+      "name": "35-个人信息",
+      "font_class": "-gerenxinxi",
+      "unicode": "e72b",
+      "unicode_decimal": 59179
+    },
+    {
+      "icon_id": "5634455",
+      "name": "thumbtack",
+      "font_class": "thumbtack",
+      "unicode": "f107",
+      "unicode_decimal": 61703
+    },
+    {
+      "icon_id": "5651471",
+      "name": "人民币",
+      "font_class": "renminbi",
+      "unicode": "e669",
+      "unicode_decimal": 58985
+    },
+    {
+      "icon_id": "5714890",
+      "name": "菜单",
+      "font_class": "caidan",
+      "unicode": "e668",
+      "unicode_decimal": 58984
+    },
+    {
+      "icon_id": "9594791",
+      "name": "搜索",
+      "font_class": "sousuo",
+      "unicode": "e64f",
+      "unicode_decimal": 58959
+    }
+  ]
+}
