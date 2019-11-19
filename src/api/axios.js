@@ -7,8 +7,8 @@ import config from '@/config'
 // 创建axios实例 application/x-www-data-urlencoded  application/json
 let baseURL = '';
 if (location.hostname === 'localhost' || location.hostname === 'devweb.saas.maocongwang.com') {
-    // baseURL = "http://uip.dev.maocongwang.com/api/UIP";
-    baseURL = "http://uip.maocongwang.com/api/UIP"
+    baseURL = "http://uip.dev.maocongwang.com/api/UIP";
+    // baseURL = "http://uip.maocongwang.com/api/UIP"
 } else {
     baseURL = "http://uip.maocongwang.com/api/UIP"
     // baseURL = "http://uip.dev.maocongwang.com/api/UIP";

@@ -18,8 +18,6 @@
         </div>
         <div class="com-addBtn-list clearfix" style="padding: 0 100px 0 30px;">
             <el-button style="background-color: #019794; border: 1px solid #019794; width: 140px;" @click="exportOrderFn()" type="primary" size="small">导出</el-button>
-            <!-- <el-button style="width: 100px;" class="fr" @click="submitFn()" type="primary" size="small" >通过</el-button>
-            <el-button style="width: 100px;" class="fr" @click="rejectFn()" type="danger" size="small">拒绝</el-button> -->
         </div>
         <div class="main clearfix">
             <div class="financeList">
@@ -29,20 +27,26 @@
                     <el-table-column type="expand">
                         <template slot-scope="props">
                             <el-table :data="props.row.orderDetail" style="width: 100%">
-                                <el-table-column label="订单信息" width="190">
+                                <el-table-column label="订单信息" width="185">
                                 </el-table-column>
-                                <el-table-column prop="inquiryID" label="订单编号/退单编号" width="170">
+                                <el-table-column prop="inquiryID" label="订单编号/退单编号" width="240">
                                 </el-table-column>
-                                <el-table-column prop="totalMoney" label="订单/退款金额 (元)" width="170">
+                                <el-table-column prop="totalMoney" label="订单/退款金额 (元)" width="190">
                                 </el-table-column>
-                                <el-table-column prop="createDatetime" label="下单时间/退款时间">
+                                <el-table-column prop="payDatetime" label="下单时间/退款时间" width="190">
                                 </el-table-column>
-                                <el-table-column>
+                                <el-table-column prop="payImg">
                                     <template slot-scope="scope">
-                                        <!-- <span @click="getOldOrderListDialogFn(scope.row)" style="display: inline-block; color: #0000ff; font-size: 14px;">操作记录</span> -->
-                                        <a href="javascript:;" v-if="props.row.payType == 1" @click="confirmDialogFn(props.row)" style="display: inline-block; color: #0000ff; font-size: 14px;maigin-left: 10px;">确认收款</a>
+                                        <!-- {{props.row.payImg}} -->
+                                        <div>
+                                            <viewer>
+                                                <img style="width: 80px; height: 60px;" :src="props.row.payImg" alt="">
+                                                <!-- <img style="width: 80px; height: 60px;" src="http://img.maocongwang.com//1573809168164.jpeg" alt=""> -->
+                                            </viewer>
+                                        </div>
                                     </template>
                                 </el-table-column>
+                               
                             </el-table>
                         </template>
                     </el-table-column>
@@ -55,36 +59,33 @@
                             <span>{{scope.row.totalMoney}}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="payDatetime" label="支付时间" width="190">
+                    <el-table-column prop="payDatetime" sortable label="支付时间" width="190">
                     </el-table-column>
-                    <el-table-column prop="payType" label="支付方式">
+                    <el-table-column 
+                        :filters="[{ text: '网银', value: '网银' }, { text: '支付宝', value: '支付宝' }, { text: '微信', value: '微信' }]" :filter-method="filterPayType" filter-placement="bottom-end"
+                        prop="payType" label="支付方式">
                         <template slot-scope="scope">
                             <span v-if="scope.row.payType == 1">网银</span>
                             <span v-if="scope.row.payType == 2">支付宝</span>
                             <span v-if="scope.row.payType == 3">微信</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="payState" label="支付状态">
+                    <el-table-column 
+                        :filters="[{ text: '待支付', value: '待支付' }, { text: '支付成功', value: '支付成功' }, { text: '支付失败', value: '支付失败' }]" :filter-method="filterPayState" filter-placement="bottom-end"
+                        prop="payState" label="支付状态">
                         <template slot-scope="scope">
                             <span v-if="scope.row.payState == 1">待支付</span>
                             <span v-if="scope.row.payState == 2">支付成功</span>
                             <span v-if="scope.row.payState == 3">支付失败</span>
                         </template>
                     </el-table-column>
-                    <!-- <el-table-column prop="reviewState" label="审核状态">
-                        <template slot-scope="scope">
-                            <span v-if="scope.row.reviewState == 1">申请中</span>
-                            <span v-if="scope.row.reviewState == 2">审核通过</span>
-                            <span v-if="scope.row.reviewState == 3">审核不通过</span>
-                        </template>
-                    </el-table-column> -->
                     <el-table-column label="操作">
                         <template slot-scope="scope">
-                            <span style="color: #0000ff; font-size: 14px;">订单明细</span>
+                            <a href="javascript:;" v-if="scope.row.payType == 1" @click="confirmDialogFn(scope.row)" style="display: inline-block; color: #0000ff; font-size: 14px;maigin-left: 10px;">确认收款</a>
                         </template>
                     </el-table-column>
                 </el-table>
-                <div class="pricesBox" style="margin-right: 60px;">
+                <div class="pricesBox">
                     共计收款
                     <span>{{totalPrice}}</span>
                     <el-tooltip style="margin-left: 10px;" class="item" effect="dark" content="网银支付收款未审批通过前不计入总计" placement="top-start">
@@ -106,18 +107,14 @@
             </span>
         </el-dialog>
         <el-dialog title="是否确认已收到该笔款项" :visible.sync="dateDialogVisible" width="400px">
-            <!-- <span>这是一段信息</span> -->
             支付时间：
             <el-date-picker v-model="dateValue" type="date" placeholder="选择日期">
             </el-date-picker>
-            <!-- <span>{{}}</span> -->
             <span slot="footer" class="dialog-footer">
                 <el-button @click="dateDialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click="confirmFn()">确 定</el-button>
             </span>
         </el-dialog>
-
-        <!--  -->
     </div>
 </template>
 
@@ -165,6 +162,27 @@ export default {
         this.getFinanceList();
     },
     methods: {
+        // 支付方式
+        filterPayType (value, row) {
+            if (value == '网银') {
+                return row.payType == 1
+            } else if (value == '支付宝') {
+                return row.payType == 2
+            } else if (value == '微信') {
+                return row.payType == 3
+            }
+        },
+        // 支付状态
+        filterPayState (value, row) {
+            if (value == '待支付') {
+                return row.payState == 1
+            } else if (value == '支付成功') {
+                return row.payState == 2
+            } else if (value == '支付失败') {
+                return row.payState == 3
+            }
+        },
+        // 搜索
         async queryBtn () {
             let token = window.sessionStorage.getItem("gn_request_token");
             let paramObj = {
@@ -174,25 +192,26 @@ export default {
                 // totalMoney: this.amounts,
                 // garagrName: this.storeValue,
             }
-            const res = await this.postData("A1035", paramObj);
-            console.log(res);
+            // const res = await this.postData("A1035", paramObj);
+            // console.log(res);
         },
+        // 确认收款ajax
         async confirmFn () {
             let token = window.sessionStorage.getItem("gn_request_token");
             let paramObj = {
                 Token: token,
-                orderNO: this.itemObj.orderNO
+                orderNO: this.itemObj.orderNO,
+                PayDatetime: this.dateValue
             }
             let res = await this.postData("A1052", paramObj);
-            console.log(res);
-
             this.$message({
                 type: 'success',
                 message: '操作成功!'
             });
+            this.getFinanceList();
             this.dateDialogVisible = false;
-            
         },
+        // 确认收款弹出框
         confirmDialogFn (item) {
             this.itemObj = item;
             this.dateDialogVisible = true;
@@ -218,60 +237,10 @@ export default {
             }
             let res = await this.postData("A1037", paramObj);
             let url = res.res.data.fileUrl;
+            console.log(url);
+            
             window.open(url)
         },
-        async getOldOrderListDialogFn (item) {
-            this.dialogOrderNo = item.orderNO;
-            console.log(this.dialogOrderNo);
-            let token = window.sessionStorage.getItem("gn_request_token");
-            let paramObj = {
-                Token: token,
-                OrderNO: this.dialogOrderNo
-            }
-            const res = await this.postData("A1049", paramObj);
-            console.log(res);
-            this.dialogVisible = true;
-        },
-        // 拒绝
-        // async rejectFn () {
-        //     let token = window.sessionStorage.getItem("gn_request_token");
-        //     let paramObj = {
-        //         Token: token,
-        //         NOList: {
-        //             orderState: 3,
-        //             OrderNo: this.orderArr
-        //         }
-        //     }
-        //     const res = await this.postData("A1041", paramObj);
-        //     console.log(res);
-        //     if (res.code == '0') {
-        //         this.$message({
-        //             type: "success",
-        //             message: res.res.msg
-        //         })
-        //         this.getFinanceList();
-        //     }
-        // },
-        // // 通过
-        // async submitFn () {
-        //     let token = window.sessionStorage.getItem("gn_request_token");
-        //     let paramObj = {
-        //         Token: token,
-        //         NOList: {
-        //             orderState: 2,
-        //             OrderNo: this.orderArr
-        //         }
-        //     }
-        //     const res = await this.postData("A1041", paramObj);
-        //     console.log(res);
-        //     if (res.code == '0') {
-        //         this.$message({
-        //             type: "success",
-        //             message: res.res.msg
-        //         })
-        //         this.getFinanceList();
-        //     }
-        // },
         // 多选表格
         handleSelectionChange (val) {
             let newArr = [];
@@ -295,7 +264,6 @@ export default {
             }
             const res = await this.postData("A1040", paramObj);
             console.log(res);
-
         },
         // 切换分页
         handleCurrentChange (val) {
@@ -325,7 +293,7 @@ export default {
 .main {
     .pricesBox {
         text-align: right;
-        padding-right: 100px;
+        padding-right: 80px;
         margin-top: 50px;
         margin-bottom: 30px;
         font-size: 20px;

@@ -24,6 +24,7 @@
                             </h3>
                         </el-carousel-item>
                     </el-carousel>
+                        <!-- this. -->
                 </div>
                 <div class="left-content">
                     <el-row style="margin-bottom: 16px;">
@@ -80,7 +81,7 @@
                                     <el-option v-for="item in addressList" :key="item.id" :label="item.address" :value="item.id">
                                     </el-option>
                                 </el-select>
-                                <el-button @click="addAddrFn()" style="margin-left: 5px;" size="small" type="primary">新增收货地址</el-button>
+                                <el-button @click="addAddrFn()" style="margin-left: 5px;" size="small" type="primary">新增地址</el-button>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -186,13 +187,13 @@
         </el-form>
         <el-dialog title="新增收货地址" width="500px" :visible.sync="dialogFormVisible">
             <el-form :inline="true" :model="addAddressObj" :rules="rules" ref="addAddressObj" class="addAddressObj">
-                <el-form-item label="收货地址" prop="name">
+                <el-form-item label="收货地址：" prop="name">
                     <el-input size="small" v-model="addAddressObj.addName"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取 消</el-button>
-                <el-button type="primary" @click="addAddressFn()">确 定</el-button>
+                <el-button size="small" @click="dialogFormVisible = false">取 消</el-button>
+                <el-button size="small" type="primary" @click="addAddressFn()">确 定</el-button>
             </div>
         </el-dialog>
     </div>
@@ -345,6 +346,11 @@ export default {
         }
     },
     created () {
+        var date1 = new Date();
+        var date2 = new Date(date1);
+        let date3 = date2.setDate(date1.getDate() + 30);
+        this.quoteForm.lastDate = new Date(date3);
+
         this.quoteForm.expireDatetime = new Date();
 
         let quoteStatusObj = JSON.parse(window.sessionStorage.getItem("quoteStatusObj"));
@@ -453,9 +459,7 @@ export default {
             this.addressList = res.res.data;
             if (this.addressList.length > 0) {
                 this.quoteForm.addValue = this.addressList[this.addressList.length - 1].id
-                // this.addValue = this.addressList[0].address
             }
-
         },
         // 获取供应商
         async getSupplierListFn () {
@@ -482,12 +486,11 @@ export default {
                 InquiryID: this.inquiryID
             }
             const res = await this.postData("A1023", paramObj);
-            console.log(res);
-
             let result = res.res.data;
             this.garageID = result.inquiry.garageID;
             this.tableData = result.inquiryComponents;
-
+            console.log(result);
+            
             if (this.tableData.length == 0) {
                 this.tableData.push({
                     componentID: '',
@@ -510,12 +513,16 @@ export default {
             if (this.quoteForm.invoiceType == 0) {
                 this.quoteForm.invoiceType = 1;
             }
-            console.log(this.quoteForm);
-            this.picArrList = this.quoteForm.pictures ? JSON.parse(this.quoteForm.pictures) : "";
-            this.picArrList.push(this.quoteForm.componentIMG);
-            this.picArrList.push(this.quoteForm.expressIMG);
-            console.log(this.picArrList);
+            this.picArrList = this.quoteForm.pictures ? JSON.parse(this.quoteForm.pictures) : [];
+            if (this.quoteForm.componentIMG) {
+                this.picArrList.push(this.quoteForm.componentIMG);
+            }
+            if (this.quoteForm.expressIMG) {
+                this.picArrList.push(this.quoteForm.expressIMG);
+            }
             this.getAddressList();
+            console.log(this.quoteForm);
+            
         },
         // 暂存
         async storageFn () {
@@ -647,14 +654,18 @@ export default {
     overflow-x: auto;
     .main-left {
         float: left;
+        width: 457px;
         .slide-wrapper {
             text-align: left;
             img {
                 width: 450px;
                 height: 270px;
+                // width: 523px;
+                // height: 275px;
             }
         }
         .left-content {
+            width: 457px;
             .el-col {
                 text-align: left;
                 line-height: 40px;

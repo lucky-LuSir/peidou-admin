@@ -152,9 +152,9 @@
                     <h2>发票信息</h2>
                 </div>
                 <div class="comInfo-content clearfix">
-                    <p v-if="quoteForm.invoiceType == 1">普票</p>
-                    <p v-if="quoteForm.invoiceType == 2">专票</p>
-                    <p v-if="quoteForm.invoiceType == 3">无票</p>
+                    <p v-if="quoteForm.invoiceType == 1">无票</p>
+                    <p v-if="quoteForm.invoiceType == 2">普票</p>
+                    <p v-if="quoteForm.invoiceType == 3">专票</p>
                 </div>
             </div>
         </div>

@@ -454,23 +454,6 @@ export default {
         this.getCityListFn();
     },
     methods: {
-        // 选择品牌
-        // handleBrandSelect (val) {
-        //     console.log(val);
-        //     let curList = val;
-        //     let BrandNameList = this.BrandNameList;
-        //     let newArr = [];
-        //     for (let i = 0; i < BrandNameList.length; i++) {
-        //         for (let j = 0; j < BrandNameList.length; j++) {
-        //             if (curList[j] == BrandNameList[i].brandID) {
-        //                 newArr.push(
-        //                     BrandNameList[i].brandName
-        //                 )
-        //             }
-        //         }
-        //     }
-        //     this.tags = newArr;
-        // },
         // 添加品牌
         addBrandFn () {
             let curBrandName;
@@ -479,6 +462,7 @@ export default {
                     curBrandName = this.BrandNameList[i].brandName
                 }
             }
+            console.log(curBrandName);
             for (let i = 0; i < this.tags.length; i++) {
                 if (this.tags[i] == curBrandName) {
                     this.$message({
@@ -488,6 +472,8 @@ export default {
                     return;
                 }
             }
+            this.tags.push(curBrandName);
+            console.log(this.tags);
         },
         // 删除品牌
         async handleTagsClose (tag) {
@@ -552,7 +538,6 @@ export default {
                             }
                         }
                     }
-
                     let detail = {
                         LegalPerson: this.addSupplierObj.legalPerson, // 法人
                         LegalPhone: this.addSupplierObj.legalPhone, // 法人手机号

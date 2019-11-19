@@ -18,15 +18,19 @@
                 <el-table :data="tableData" border>
                     <el-table-column prop="garageCode" label="门店编号" width="120">
                     </el-table-column>
-                    <el-table-column prop="garagrName" label="门店名称" width="120">
+                    <el-table-column prop="garagrName" label="门店名称" width="200">
                     </el-table-column>
-                    <el-table-column prop="userName" label="店员姓名" width="120">
+                    <el-table-column prop="userName" label="店员姓名" width="200">
                     </el-table-column>
-                    <el-table-column prop="userPhone" label="店员手机号" width="150">
+                    <el-table-column prop="userPhone" label="店员手机号" width="200">
                     </el-table-column>
-                    <el-table-column sortable prop="createDateTime" label="提交时间" width="170">
+                    <el-table-column sortable prop="createDateTime" label="提交时间" width="200">
                     </el-table-column>
-                    <el-table-column class="approvalState" prop="approvalState" label="审核状态" width="120">
+                    <el-table-column 
+                        :filters="[{ text: '申请中', value: '申请中' }, { text: '通过', value: '通过' }, { text: '不通过', value: '不通过' }]"
+                        :filter-method="filterState"
+                        filter-placement="bottom-end"
+                        class="approvalState" prop="approvalState" label="审核状态" width="120">
                         <template slot-scope="scope">
                             <div @click="examineDrawer(scope.row)" v-if="scope.row.approvalState == '1'" style="color: #ff7e01;">
                                 申请中
@@ -165,7 +169,7 @@
                             审核意见：
                         </span>
                         <span style="width: 550px;" class="text">
-                            无
+                            {{editClerkForm.remark}}
                         </span>
                     </div>
                     <div class="comInfo-content">
@@ -173,13 +177,12 @@
                             初审：
                         </span>
                         <span class="text">
-                            陈元新
                         </span>
                         <span style="margin-left: 35px;" class="_labelW80">
                             审核时间
                         </span>
                         <span class="text">
-                            2019-9-26 10:10:10
+                            
                         </span>
                     </div>
                     <div class="comInfo-content">
@@ -187,13 +190,12 @@
                             复核：
                         </span>
                         <span class="text">
-                            陈元新
+                            
                         </span>
                         <span style="margin-left: 35px;" class="_labelW80">
                             复核时间
                         </span>
                         <span class="text">
-                            2019-9-26 10:10:10
                         </span>
                     </div>
                 </div>
@@ -206,7 +208,7 @@
                             门店名称：
                         </span>
                         <span class="text">
-                            汽配商城1店
+                            {{editClerkForm.garagrName}}
                         </span>
                     </div>
                     <div class="comInfo-content">
@@ -214,8 +216,7 @@
                             所在区域：
                         </span>
                         <span class="text">
-                            <!-- <el-cascader size="small" :options="options" clearable></el-cascader> -->
-                            暂无
+                            {{editClerkForm.location}}
                         </span>
                     </div>
                     <div class="comInfo-content">
@@ -223,7 +224,7 @@
                             门店地址：
                         </span>
                         <span class="text">
-                            金钟路989号
+                            {{editClerkForm.address}}
                         </span>
                     </div>
                 </div>
@@ -236,7 +237,7 @@
                             店员姓名：
                         </span>
                         <span class="text">
-                            {{addClerkForm.addClerkName}}
+                            {{editClerkForm.userName}}
                         </span>
                     </div>
                     <div class="comInfo-content">
@@ -244,12 +245,103 @@
                             店员手机号：
                         </span>
                         <span class="text">
-                            {{addClerkForm.addClerkMobile}}
+                            {{editClerkForm.userPhone}}
                         </span>
                     </div>
                 </div>
                 <div class="el-drawer__footer">
                     <el-button style="margin-left: 20px;" size="small" type="primary" @click="examineClerkDoneDialogVisible = false">返 回</el-button>
+                </div>
+            </div>
+        </el-drawer>
+        <el-drawer title="审核不通过" :visible.sync="examineClerkRejectDialogVisible" direction="rtl" custom-class="addClerkDrawer" ref="drawer" size="50%">
+            <div class="demo-drawer__content">
+                <div class="com-info">
+                    <div class="comInfo-content">
+                        <span class="_labelW80">
+                            审核意见：
+                        </span>
+                        <span style="width: 550px;" class="text">
+                            {{editClerkForm.remark}}
+                        </span>
+                    </div>
+                    <div class="comInfo-content">
+                        <span class="_labelW80">
+                            初审：
+                        </span>
+                        <span class="text">
+                        </span>
+                        <span style="margin-left: 35px;" class="_labelW80">
+                            审核时间
+                        </span>
+                        <span class="text">
+                        </span>
+                    </div>
+                    <div class="comInfo-content">
+                        <span class="_labelW80">
+                            复核：
+                        </span>
+                        <span class="text">
+                        </span>
+                        <span style="margin-left: 35px;" class="_labelW80">
+                            复核时间
+                        </span>
+                        <span class="text">
+                        </span>
+                    </div>
+                </div>
+                <div class="com-info">
+                    <div class="comInfo-top">
+                        <h2>门店信息</h2>
+                    </div>
+                    <div class="comInfo-content">
+                        <span class="_labelW80">
+                            门店名称：
+                        </span>
+                        <span class="text">
+                            {{editClerkForm.garagrName}}
+                        </span>
+                    </div>
+                    <div class="comInfo-content">
+                        <span class="_labelW80">
+                            所在区域：
+                        </span>
+                        <span class="text">
+                            {{editClerkForm.location}}
+                        </span>
+                    </div>
+                    <div class="comInfo-content">
+                        <span class="_labelW80">
+                            门店地址：
+                        </span>
+                        <span class="text">
+                            {{editClerkForm.address}}
+                        </span>
+                    </div>
+                </div>
+                <div class="com-info">
+                    <div class="comInfo-top">
+                        <h2>店员信息</h2>
+                    </div>
+                    <div class="comInfo-content">
+                        <span class="_labelW90">
+                            店员姓名：
+                        </span>
+                        <span class="text">
+                            {{editClerkForm.userName}}
+                        </span>
+                    </div>
+                    <div class="comInfo-content">
+                        <span class="_labelW90">
+                            店员手机号：
+                        </span>
+                        <span class="text">
+                            {{editClerkForm.userPhone}}
+                        </span>
+                    </div>
+                </div>
+                <div class="el-drawer__footer">
+                    <el-button style="margin-left: 20px;" size="small" type="primary" @click="examineClerkRejectDialogVisible = false">返 回</el-button>
                 </div>
             </div>
         </el-drawer>
@@ -270,6 +362,7 @@ export default {
             addClerkDialogVisible: false,
             examineClerkDialogVisible: false,
             examineClerkDoneDialogVisible: false,
+            examineClerkRejectDialogVisible: false,
             loading: false,
             form: {
                 name: '',
@@ -314,6 +407,18 @@ export default {
         this.getClerkListFn();
     },
     methods: {
+        // 过滤状态
+        filterState(value, row) {
+            console.log(value);
+            console.log(row);
+            if (value == '申请中') {
+                return row.approvalState == '1'
+            } else if (value == '通过') {
+                return row.approvalState == '2'
+            } else if (value == '不通过') {
+                return row.approvalState == '3'
+            }
+        },
         // 查询
         async queryBtn () {
             console.log(this.clerkNameIpt);
@@ -332,6 +437,7 @@ export default {
             this.currentPage = result.pageIndex;
             this.tableData = res.res.data.date;
         },
+        // 分页
         handleCurrentChange (val) {
             this.getClerkListFn(val);
         },
@@ -414,6 +520,7 @@ export default {
                         })
                         this.addClerkDialogVisible = false;
                         this.$refs[addClerkForm].resetFields();
+                        this.getClerkListFn();
                     }
                 } else {
                     return false;
@@ -476,10 +583,16 @@ export default {
         async examineDrawer (item) {
             this.userID = item.userID;
             if (item.approvalState == 1) {
+                // 审核中
                 this.examineClerkDialogVisible = true;
             }
             if (item.approvalState == 2) {
+                // 审核通过
                 this.examineClerkDoneDialogVisible = true;
+            }
+            if (item.approvalState == 3) {
+                // 审核不通过
+                this.examineClerkRejectDialogVisible = true;
             }
 
             let token = window.sessionStorage.getItem("gn_request_token");
@@ -489,14 +602,16 @@ export default {
             }
             const res = await this.postData("A1043", paramObj);
             let result = res.res.data;
+            console.log(result);
+            
             let addressObj = result.garageAddress ? result.garageAddress[0] : '';
             let newObj = {
                 idea: '',
             };
             Object.assign(newObj, result.garageAccount, result.garageDetail, result.user, addressObj);
-            console.log(this.editClerkForm);
 
             this.editClerkForm = newObj;
+            console.log(this.editClerkForm);
 
             // this.editClerkForm.storeName = result.garageDetail.garagrName;
             // this.editClerkForm.storeAddress = result.garageAddress ? result.garageAddress[1].address : '';

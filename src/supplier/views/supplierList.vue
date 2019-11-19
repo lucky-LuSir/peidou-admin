@@ -20,17 +20,25 @@
                     </el-table-column>
                     <el-table-column prop="companyName" label="供货商名称" width="240">
                     </el-table-column>
-                    <el-table-column prop="contractStartTime" label="合作到期时间" width="190">
+                    <el-table-column prop="contractStartTime" sortable label="合作到期时间" width="190">
                         <template slot-scope="scope">
                             <span>{{scope.row.contractStartTime}}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="isOpen" label="状态" width="170">
+                    <el-table-column 
+                        :filters="[{ text: '启用', value: '启用' }, { text: '关闭', value: '关闭' }]"
+                        :filter-method="filterIsOpen"
+                        filter-placement="bottom-end"
+                        prop="isOpen" label="状态" width="170">
                         <template slot-scope="scope">
                             <span>{{scope.row.isOpen == 1 ? '启用' : '关闭'}}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="supplierState" label="审核状态" width="170">
+                    <el-table-column 
+                        :filters="[{ text: '待审核', value: '待审核' }, { text: '审核通过', value: '审核通过' }, { text: '审核不通过', value: '审核不通过' }, { text: '待完善', value: '待完善' }]"
+                        :filter-method="filterState"
+                        filter-placement="bottom-end"
+                        prop="supplierState" label="审核状态" width="170">
                         <template slot-scope="scope">
                             <span @click="toEditSupplierFn(scope.row)" style="color: #ff9900;" v-if="scope.row.supplierState == 1">待审核</span>
                             <span @click="toEditSupplierFn(scope.row)" style="color: #008000;" v-if="scope.row.supplierState == 2">审核通过</span>
@@ -89,6 +97,27 @@ export default {
         this.getSupplierListFn();
     },
     methods: {
+        // 过滤启用状态
+        filterIsOpen(value, row) {
+            if (value == '启用') {
+                return row.isOpen == 1
+            } else if (value == '关闭') {
+                return row.isOpen == 2
+            }
+        },
+        // 过滤状态
+        filterState(value, row) {
+            if (value == '待审核') {
+                return row.supplierState == 1
+            } else if (value == '审核通过') {
+                return row.supplierState == 2
+            } else if (value == '审核不通过') {
+                return row.supplierState == 3
+            } else if (value == '待完善') {
+                return row.supplierState == 4
+            }
+        },
+        // 查询
         async queryBtn () {
             let token = window.sessionStorage.getItem("gn_request_token");
             let paramObj = {

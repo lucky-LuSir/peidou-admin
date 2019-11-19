@@ -8,13 +8,21 @@
     <title>Title</title>
 </head>
 <script>
+<<<<<<< HEAD
     window.onload = function() {
+=======
+    window.onload = function () {
+>>>>>>> 19号代码
         new Vue({
             el: "#app",
             data: {
                 //商品数据
+<<<<<<< HEAD
                 goods: [
                     {
+=======
+                goods: [{
+>>>>>>> 19号代码
                         id: 1,
                         name: '【详情页领券！到手价2099元起】Xiaomi/小米小米8年度旗舰全面屏骁',
                         price: 2299.00,
@@ -119,6 +127,10 @@
                     if (!event.currentTarget.checked) {
                         this.allSelectedGoods = [];
                     } else {
+<<<<<<< HEAD
+=======
+
+>>>>>>> 19号代码
                         this
                             .allSelectedGoods = []; //先置空，然后再重新添加，不然数组里会有重复！因为有可能点击全选之前已经选择了几个单选按钮。也就是数组里已经添加过了对应的id。
                         this.goods.forEach((v, k) => {
@@ -147,6 +159,7 @@
                     if (confirm("确认删除" + this.allSelectedGoods.length + "条信息吗？")) {
                         for (var i = this.goods.length - 1; i >= 0; i--) {
                             if (this.allSelectedGoods.indexOf(this.goods[i].id) !== -1) {
+<<<<<<< HEAD
                                 // 从allSelectedGoods数组中也需要删除
                                 var index = this.allSelectedGoods.indexOf(this.goods[i].id);
                                 this.allSelectedGoods.splice(index, 1);
@@ -157,6 +170,17 @@
                         }
                         //这种写法是错误的，因为数组每次删除一条数据以后索引
                         // 值会发生变化，所以用上述的倒叙删除，先删除索引大的数据
+=======
+                                //从allSelectedGoods数组中也需要删除
+                                var index = this.allSelectedGoods.indexOf(this.goods[i].id);
+                                this.allSelectedGoods.splice(index, 1);
+                                //删除goods数组中的信息
+                                /*var index = this.goods.indexOf(v.id);*/
+                                this.goods.splice(i, 1);
+                            }
+                        }
+                        //这种写法是错误的，因为数组每次删除一条数据以后索引值会发生变化，所以用上述的倒叙删除，先删除索引大的数据
+>>>>>>> 19号代码
                         /* this.goods.forEach((v, k) => {
                              if (this.allSelectedGoods.indexOf(v.id)!==-1) {
                              //从allSelectedGoods数组中也需要删除
@@ -188,12 +212,20 @@
 
 
                     //加入选择框以后的计算总价
+<<<<<<< HEAD
                     this.goods.forEach((v, k) => {
                         if (this.allSelectedGoods.indexOf(v.id) !== -1) {
                             console.log(v.price)
                             totalprice += v.price * v.num;
                         }
                     });
+=======
+                    // this.goods.forEach((v, k) => {
+                    //     if (this.allSelectedGoods.indexOf(v.id) !== -1) {
+                    //         totalprice += v.price * v.num;
+                    //     }
+                    // });
+>>>>>>> 19号代码
                     return totalprice;
                 },
             }
@@ -216,7 +248,12 @@
                     <table class="table table-hover">
                         <thead>
                             <tr>
+<<<<<<< HEAD
                                 <th><input type="checkbox" @click="selectAll()" :checked="goods.length===allSelectedGoods.length&&goods.length"></th>
+=======
+                                <th><input type="checkbox" @click="selectAll()"
+                                        :checked="goods.length===allSelectedGoods.length&&goods.length"></th>
+>>>>>>> 19号代码
                                 <th>商品名称</th>
                                 <th>商品单价</th>
                                 <th>购买数量</th>
@@ -226,6 +263,7 @@
                         </thead>
 
                         <tr v-for="(v,k) in goods" v-show="goods.length!==0">
+<<<<<<< HEAD
                             <td><input type="checkbox" @click="selectSingle(k)" :checked="allSelectedGoods.indexOf(v.id)>=0"></td>
                             <td>{{v.name}}</td>
                             <td>￥{{v.price}}</td>
@@ -235,6 +273,20 @@
                                 </button>
                                 <input type="text" v-model="v.num" style="width:25px;text-align: center">
                                 <button type="button" style="width:25px;text-align: center" @click="changeNum(k,v.num,1)">
+=======
+                            <td><input type="checkbox" @click="selectSingle(k)"
+                                    :checked="allSelectedGoods.indexOf(v.id)>=0"></td>
+                            <td>{{v.name}}</td>
+                            <td>￥{{v.price}}</td>
+                            <td>
+                                <button type="button" style="width:25px;text-align: center"
+                                    @click="changeNum(k,v.num,-1)">
+                                    -
+                                </button>
+                                <input type="text" v-model="v.num" style="width:25px;text-align: center">
+                                <button type="button" style="width:25px;text-align: center"
+                                    @click="changeNum(k,v.num,1)">
+>>>>>>> 19号代码
                                     +
                                 </button>
                             </td>

@@ -28,13 +28,13 @@
                     <el-table-column type="expand">
                         <template slot-scope="props">
                             <el-table :data="props.row.orderDetail" style="width: 100%">
-                                <el-table-column label="订单信息" width="190">
+                                <el-table-column label="订单信息" width="185">
                                 </el-table-column>
-                                <el-table-column prop="inquiryID" label="订单编号/退单编号" width="200">
+                                <el-table-column prop="inquiryID" label="订单编号/退单编号" width="240">
                                 </el-table-column>
-                                <el-table-column prop="totalMoney" label="订单/退款金额 (元)" width="200">
+                                <el-table-column prop="totalMoney" label="订单/退款金额 (元)" width="190">
                                 </el-table-column>
-                                <el-table-column prop="createDatetime" label="下单时间/退款时间" width="200">
+                                <el-table-column prop="payDatetime" label="下单时间/退款时间" width="190">
                                 </el-table-column>
                                 <el-table-column prop="payImg">
                                     <template slot-scope="scope">
@@ -69,23 +69,27 @@
                             <span>{{scope.row.totalMoney}}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="payDatetime" label="支付时间" width="190">
+                    <el-table-column prop="payDatetime" sortable label="支付时间" width="190">
                     </el-table-column>
-                    <el-table-column prop="payType" label="支付方式">
+                    <el-table-column 
+                        :filters="[{ text: '网银', value: '网银' }, { text: '支付宝', value: '支付宝' }, { text: '微信', value: '微信' }]" :filter-method="filterPayType" filter-placement="bottom-end"
+                        prop="payType" label="支付方式">
                         <template slot-scope="scope">
                             <span v-if="scope.row.payType == 1">网银</span>
                             <span v-if="scope.row.payType == 2">支付宝</span>
                             <span v-if="scope.row.payType == 3">微信</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="payState" label="支付状态">
+                    <el-table-column 
+                        :filters="[{ text: '待支付', value: '待支付' }, { text: '支付成功', value: '支付成功' }, { text: '支付失败', value: '支付失败' }]" :filter-method="filterPayState" filter-placement="bottom-end" 
+                        prop="payState" label="支付状态">
                         <template slot-scope="scope">
                             <span v-if="scope.row.payState == 1">待支付</span>
                             <span v-if="scope.row.payState == 2">支付成功</span>
                             <span v-if="scope.row.payState == 3">支付失败</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="reviewState" label="审核状态">
+                    <el-table-column :filters="[{ text: '申请中', value: '申请中' }, { text: '审核通过', value: '审核通过' }, { text: '审核不通过', value: '审核不通过' }]" :filter-method="filterState" filter-placement="bottom-end" prop="reviewState" label="审核状态">
                         <template slot-scope="scope">
                             <span v-if="scope.row.reviewState == 1" style="color: #ff9900;">申请中</span>
                             <span v-if="scope.row.reviewState == 2" style="color: #008000;">审核通过</span>
@@ -97,11 +101,13 @@
                             <span style="color: #0000ff; font-size: 14px;">订单明细</span>
                         </template>
                     </el-table-column>
-
                 </el-table>
                 <div class="pricesBox">
                     共计收款
                     <span>{{totalPrice}}</span>
+                    <el-tooltip style="margin-left: 10px;" class="item" effect="dark" content="网银支付收款未审批通过前不计入总计" placement="top-start">
+                        <i class="el-icon-info"></i>
+                    </el-tooltip>
                 </div>
                 <el-pagination style="margin: 30px 0;" @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="pageSize" layout="total, prev, pager, next" background :total="totalNum">
                 </el-pagination>
@@ -159,10 +165,42 @@ export default {
     },
     created () {
         this.getFinanceList();
+        // this.dateValue = window.sessionStorage.getItem("PayDatetime");
+        // console.log(this.dateValue);
     },
     methods: {
+        // 支付方式
+        filterPayType (value, row) {
+            if (value == '网银') {
+                return row.payType == 1
+            } else if (value == '支付宝') {
+                return row.payType == 2
+            } else if (value == '微信') {
+                return row.payType == 3
+            }
+        },
+        // 支付状态
+        filterPayState (value, row) {
+            if (value == '待支付') {
+                return row.payState == 1
+            } else if (value == '支付成功') {
+                return row.payState == 2
+            } else if (value == '支付失败') {
+                return row.payState == 3
+            }
+        },
+        // 过滤状态
+        filterState (value, row) {
+            if (value == '申请中') {
+                return row.reviewState == 1
+            } else if (value == '审核通过') {
+                return row.reviewState == 2
+            } else if (value == '审核不通过') {
+                return row.reviewState == 3
+            }
+        },
+        // 获取原订单
         getYuanOrderFn (item) {
-            console.log(item);
             // oldOrderList
             window.sessionStorage.setItem("financeId", item.inquiryID);
             let data = {
@@ -222,11 +260,10 @@ export default {
                 Token: token,
                 NOList: {
                     orderState: 2,
-                    OrderNo: this.orderArr
+                    OrderNo: this.orderArr,
                 }
             }
             const res = await this.postData("A1041", paramObj);
-            console.log(res);
             if (res.code == '0') {
                 this.$message({
                     type: "success",
@@ -288,7 +325,7 @@ export default {
 .main {
     .pricesBox {
         text-align: right;
-        padding-right: 100px;
+        padding-right: 80px;
         margin-top: 50px;
         margin-bottom: 30px;
         font-size: 20px;

@@ -19,17 +19,21 @@
                 <el-table :data="tableData" border>
                     <el-table-column prop="garageCode" label="门店编号" width="120">
                     </el-table-column>
-                    <el-table-column prop="garagrName" label="门店名称" width="120">
+                    <el-table-column prop="garagrName" label="门店名称" width="250">
                     </el-table-column>
-                    <el-table-column prop="address" label="门店地址" width="300">
+                    <el-table-column prop="address" label="门店地址" width="250">
                     </el-table-column>
-                    <el-table-column prop="legalPerson" label="姓名" width="100">
+                    <el-table-column prop="legalPerson" label="姓名" width="150">
                     </el-table-column>
-                    <el-table-column prop="legalPhone" label="手机号" width="120">
+                    <el-table-column prop="legalPhone" label="手机号" width="150">
                     </el-table-column>
                     <el-table-column sortable prop="createDateTime" label="提交时间" width="170">
                     </el-table-column>
-                    <el-table-column prop="stateObj" label="审核状态" width="120">
+                    <el-table-column 
+                        :filters="[{ text: '申请中', value: '申请中' }, { text: '待复核', value: '待复核' }, { text: '申请通过', value: '申请通过' }, { text: '申请不通过', value: '申请不通过' }]"
+                        :filter-method="filterState"
+                        filter-placement="bottom-end"
+                        prop="stateObj" label="审核状态" width="120">
                         <template slot-scope="scope">
                             <div @click="getDetail(scope.row)" v-if="scope.row.stateObj.approvalState == '1' && scope.row.stateObj.reviewState == '0'" style="color: #ff7e01;">
                                 申请中
@@ -45,7 +49,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="operatorAccount" label="创建人" width="100">
+                    <el-table-column prop="operatorAccount" label="创建人" width="120">
                     </el-table-column>
                     <el-table-column label="操作" width="180">
                         <template slot-scope="scope">
@@ -120,16 +124,18 @@ export default {
             options: [],
             rules: {
                 storeName: [
-                    { required: true, message: '请输入活动名称', trigger: 'blur' },
+                    { required: true, message: '请输入门店名称', trigger: 'blur' },
                 ],
                 clerkName: [
-                    { required: true, message: '请输入活动名称', trigger: 'blur' },
+                    { required: true, message: '请输入店员名称', trigger: 'blur' },
                 ],
                 clerkMobile: [
-                    { required: true, message: '请输入活动名称', trigger: 'blur' },
-                ],
-                idea: [
-                    { required: true, message: '请输入活动名称', trigger: 'blur' },
+                    { required: true, message: '请输入店员电话', trigger: 'blur' },
+                    {
+                        pattern: /^1[3|4|5|7|8][0-9]\d{8}$/,
+                        message: '手机号格式不对',
+                        trigger: 'blur'
+                    }
                 ],
             },
             storeList: [],
@@ -148,7 +154,6 @@ export default {
                 secondRole: '',
                 firstRole: '',
             },
-            curClerk: '',
         }
     },
     props: ["paramsObj"],
@@ -164,12 +169,24 @@ export default {
             }
         }
         this.getStoreList();
-        this.getMenuListFn();
     },
     methods: {
+        // 过滤状态
+        filterState(value, row) {
+            console.log(value);
+            console.log(row);
+            if (value == '申请中') {
+                return row.stateObj.approvalState == '1' && row.stateObj.reviewState == '0'
+            } else if (value == '待复核') {
+                return row.stateObj.approvalState == '1' && row.stateObj.reviewState == '1'
+            } else if (value == '申请通过') {
+                return row.stateObj.approvalState == '2'
+            } else if (value == '申请不通过') {
+                return row.stateObj.approvalState == '3'
+            }
+        },
+        // 查询
         async queryBtn () {
-            console.log(this.storeNameIpt);
- 
             let token = window.sessionStorage.getItem("gn_request_token");
             let paramObj = {
                 Token: token,
@@ -190,6 +207,7 @@ export default {
             }
             this.tableData = tableData;
         },
+        // 改变分页
         handleCurrentChange (val) {
             this.getStoreList(val);
         },
@@ -224,9 +242,9 @@ export default {
         // 添加店员抽屉
         addClerkDialogFn (item) {
             console.log(item);
-            this.curClerk = item.garageID
-            this.addClerkDialogVisible = true;
+            this.addClerkForm.storeName = item.garageID;
             this.getStoreListFn();
+            this.addClerkDialogVisible = true;
         },
         // 打开抽屉时获取门店列表
         async getStoreListFn () {
@@ -237,8 +255,7 @@ export default {
             const res = await this.postData("A1053", paramObj);
             let storeList = res.res.data.date;
             this.storeList = storeList;
-            this.addClerkForm.storeName = this.storeList[0].garageID;
-            // this.addClerkForm.storeName = this.curClerk;
+            this.getStoreDetailFn();
         },
         // 获取门店相关数据
         async getStoreDetailFn () {
@@ -252,15 +269,6 @@ export default {
             let receAddress = result.garageAddress[1];
             this.addClerkForm.storeAddress = receAddress.address;
             this.addClerkForm.regionValue = receAddress.location;
-        },
-        async getMenuListFn () {
-            let token = window.sessionStorage.getItem("gn_request_token");
-            let paramObj = {
-                Token: token,
-                PageIndex: 1,
-                PageSize: 20
-            }
-            const menuListRes = await this.postData("A1005", paramObj);
         },
         // 获取门店
         async getStoreList (val) {
@@ -323,12 +331,14 @@ export default {
             };
             this.$emit('backParam', data);
         },
+        // 查询输入框
         querySearch (queryString, cb) {
             var restaurants = this.storeList;
             var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
             // 调用 callback 返回建议列表的数据
             cb(results);
         },
+        // 查询输入框
         createFilter (queryString) {
             return (restaurant) => {
                 return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);

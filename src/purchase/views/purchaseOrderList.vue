@@ -415,48 +415,8 @@
                 </el-tabs>
             </div>
         </div>
-        <!-- <el-dialog title="提示" :visible.sync="dialogVisible" width="500px">
-            <el-upload action="#" :limit="1" list-type="picture-card" :auto-upload="true" :file-list="faceIDCardsImgList" :http-request="faceIDCardsFn">
-                <i slot="default" class="el-icon-plus"></i>
-                <div slot="file" slot-scope="{file}">
-                    <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">
-                    <span class="el-upload-list__item-actions">
-                        <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(file)">
-                            <i class="el-icon-zoom-in"></i>
-                        </span>
-                        <span v-if="!disabled" class="el-upload-list__item-delete" @click="faceIDCardsImgListRemove(file)">
-                            <i class="el-icon-delete"></i>
-                        </span>
-                    </span>
-                </div>
-            </el-upload>
-            <el-dialog :visible.sync="dialogVisible">
-                <img width="100%" :src="dialogImageUrl" alt="">
-            </el-dialog>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-            </span>
-        </el-dialog> -->
         <el-drawer title="物流凭证" :before-close="handleUploadClose" :visible.sync="examineClerkDoneDialogVisible" direction="rtl" custom-class="addClerkDrawer" ref="drawer" size="50%">
             <div class="demo-drawer__content">
-                <!-- <el-upload action="#" :limit="3" list-type="picture-card" :auto-upload="true" :file-list="faceIDCardsImgList" :http-request="faceIDCardsFn">
-                    <i slot="default" class="el-icon-plus"></i>
-                    <div slot="file" slot-scope="{file}">
-                        <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">
-                        <span class="el-upload-list__item-actions">
-                            <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(file)">
-                                <i class="el-icon-zoom-in"></i>
-                            </span>
-                            <span v-if="!disabled" class="el-upload-list__item-delete" @click="faceIDCardsImgListRemove(file)">
-                                <i class="el-icon-delete"></i>
-                            </span>
-                        </span>
-                    </div>
-                </el-upload>
-                <el-dialog :visible.sync="dialogVisible">
-                    <img width="100%" :src="dialogImageUrl" alt="">
-                </el-dialog> -->
                 <el-upload :limit="3" action="#" list-type="picture-card" :file-list="faceIDCardsImgList" :on-preview="handlePictureCardPreview" :on-remove="handleRemove" :http-request="faceIDCardsFn">
                     <i class="el-icon-plus"></i>
                 </el-upload>
@@ -464,9 +424,6 @@
                     <img width="100%" :src="dialogImageUrl" alt="">
                 </el-dialog>
                 <el-button class="uploadBtn" type="primary" @click="updateFn()">上传</el-button>
-                <!-- <div class="el-drawer__footer">
-                    <el-button style="margin-left: 20px;" size="small"  @click="examineClerkDoneDialogVisible = false">返 回</el-button>
-                </div> -->
             </div>
         </el-drawer>
     </div>

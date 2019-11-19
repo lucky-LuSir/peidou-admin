@@ -305,7 +305,7 @@ export default {
                 CompanyName: '',
                 GaragrName: '',
                 CreditCode: '',
-                isOpen: '',
+                isOpen: 1,
                 regionValue: '',
                 registerAddress: '',
                 Amount: '',
@@ -406,6 +406,7 @@ export default {
             contractImgList: [], // 协议合同
             haveBrandNameList: [],
             tags: [],
+            Server: [],
         }
     },
     created () {
@@ -417,17 +418,22 @@ export default {
             let curList = val;
             let BrandNameList = this.BrandNameList;
             let newArr = [];
+            let arrs = [];
             for (let i = 0; i < BrandNameList.length; i++) {
                 for (let j = 0; j < BrandNameList.length; j++) {
                     if (curList[j] == BrandNameList[i].brandID) {
                         newArr.push(
                             BrandNameList[i].brandName
-                        )
+                        );
+                        arrs.push({
+                            BrandName: BrandNameList[i].brandName,
+                            BrandPrefix: BrandNameList[i].brandPrefix,
+                        })
                     }
                 }
             }
-            console.log(newArr);
             this.tags = newArr;
+            this.Server = arrs;
         },
         handleTagsClose (tag) {
             // this.tags.splice(this.tags.indexOf(tag), 1);
@@ -444,14 +450,6 @@ export default {
                         return;
                     }
                     let token = window.sessionStorage.getItem("gn_request_token");
-
-                    let curBrandArr = this.BrandNameList.filter((item, index) => item.brandID == this.addSupplierObj.BrandName)
-                    let BrandArr = [];
-                    let arr = this.addSupplierObj.BrandName;
-                    for (let i = 0; i < arr.length; i++) {
-                        let curBrandArr = this.BrandNameList.filter((item, index) => item.brandID == arr[i])
-                        BrandArr.push(curBrandArr[0])
-                    }
 
                     let detail = {
                         LegalPerson: this.addSupplierObj.LegalPerson, // 法人
@@ -484,7 +482,6 @@ export default {
                         location: this.location,
                         addrType: 1
                     }
-                    let Server = BrandArr
                     let SupAccount = [
                         {
                             bankType: 1,
@@ -508,7 +505,7 @@ export default {
                         detail: detail,
                         info: info,
                         Address: Address,
-                        Server: Server,
+                        Server: this.Server,
                         SupAccount: SupAccount
                     }
                     console.log(paramObj);
@@ -545,7 +542,6 @@ export default {
 
             const res = await this.postData("A1028", paramObj);
             console.log(res);
-              
             this.BrandNameList = res.res.data.date;
 
         },

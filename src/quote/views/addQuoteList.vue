@@ -162,7 +162,7 @@
         </div>
         <el-dialog title="新增收货地址" width="500px" :visible.sync="dialogFormVisible">
             <el-form :inline="true" :model="addAddressObj" :rules="rules" ref="addAddressObj" class="addAddressObj">
-                <el-form-item label="收货地址" prop="name">
+                <el-form-item label="收货地址：" prop="name">
                     <el-input size="small" v-model="addAddressObj.addName"></el-input>
                 </el-form-item>
             </el-form>
@@ -268,7 +268,7 @@ export default {
             ],
             servicePriceList: [
                 {
-                    value: 0,
+                    value: 1,
                     label: '不可退货'
                 },
                 {
@@ -284,6 +284,11 @@ export default {
         Header,
     },
     created () {
+        var date1 = new Date();
+        var date2 = new Date(date1);
+        let date3 = date2.setDate(date1.getDate() + 30);
+        this.addQuoteForm.lastDate = new Date(date3);
+        
         this.getStoreListFn();
         this.getsupplierListFn();
     },
@@ -423,7 +428,6 @@ export default {
                         garageID: this.garageID
                     }
                     console.log(paramObj);
-                    
                     const res = await this.postData("A1038", paramObj);
                     if (res.code == '0') {
                         this.$message({
