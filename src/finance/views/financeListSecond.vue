@@ -104,7 +104,7 @@
                 </el-table>
                 <div class="pricesBox">
                     共计收款
-                    <span>{{totalPrice}}</span>
+                    <span>{{totalPrice | ToFixed}}</span>
                     <el-tooltip style="margin-left: 10px;" class="item" effect="dark" content="网银支付收款未审批通过前不计入总计" placement="top-start">
                         <i class="el-icon-info"></i>
                     </el-tooltip>

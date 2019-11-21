@@ -8,7 +8,6 @@
                 </el-option>
             </el-select> -->
             <el-input style="margin-right: 60px;width: 230px;" size="small" v-model="storeValue" placeholder="付款门店名称"></el-input>
-
             <el-input style="margin-right: 60px; width: 230px;" size="small" v-model="amounts" placeholder="付款金额"></el-input>
             支付时间：
             <el-date-picker size="small" unlink-panels v-model="payDate" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
@@ -46,7 +45,6 @@
                                         </div>
                                     </template>
                                 </el-table-column>
-                               
                             </el-table>
                         </template>
                     </el-table-column>
@@ -87,7 +85,7 @@
                 </el-table>
                 <div class="pricesBox">
                     共计收款
-                    <span>{{totalPrice}}</span>
+                    <span>{{ totalPrice | ToFixed }}</span>
                     <el-tooltip style="margin-left: 10px;" class="item" effect="dark" content="网银支付收款未审批通过前不计入总计" placement="top-start">
                         <i class="el-icon-info"></i>
                     </el-tooltip>
@@ -193,7 +191,6 @@ export default {
                 // garagrName: this.storeValue,
             }
             // const res = await this.postData("A1035", paramObj);
-            // console.log(res);
         },
         // 确认收款ajax
         async confirmFn () {
@@ -230,15 +227,12 @@ export default {
         },
         // 导出订单
         async exportOrderFn () {
-            console.log(1);
             let token = window.sessionStorage.getItem("gn_request_token");
             let paramObj = {
                 Token: token,
             }
             let res = await this.postData("A1037", paramObj);
             let url = res.res.data.fileUrl;
-            console.log(url);
-            
             window.open(url)
         },
         // 多选表格
@@ -253,8 +247,6 @@ export default {
         },
         // 表格展开
         async clickTable (row, index, e) {
-            console.log(row);
-
             this.$refs.refTable.toggleRowExpansion(row)
             this.orderNO = row.orderNO;
             let token = window.sessionStorage.getItem("gn_request_token");
@@ -263,7 +255,6 @@ export default {
                 orderNO: this.orderNO,
             }
             const res = await this.postData("A1040", paramObj);
-            console.log(res);
         },
         // 切换分页
         handleCurrentChange (val) {
@@ -280,7 +271,6 @@ export default {
             const res = await this.postData("A1035", paramObj);
             // const res = await this.postData("A1037", paramObj);
             let result = res.res.data;
-            console.log(result);
             this.totalNum = result.count;
             this.currentPage = result.pageIndex;
             this.tableData = result.date;

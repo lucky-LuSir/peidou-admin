@@ -35,15 +35,11 @@ Viewer.setDefaults({
     }
 });
 
-// import md5 from "js-md5";
-
 import {
     addCookie,
     getCookie,
     delCookie
 } from "./common/js/cookie.js";
-
-
 
 Vue.prototype.$cookieStore = {
     addCookie,
@@ -51,6 +47,12 @@ Vue.prototype.$cookieStore = {
     delCookie
 };
 
+Vue.filter("ToFixed", function (value) {
+    if (value) {
+        console.log(value);
+        return value.toFixed(2);
+    }
+});
 
 router.beforeEach((to, from, next) => {
     let token = window.sessionStorage.getItem("gn_request_token");

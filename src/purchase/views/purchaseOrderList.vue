@@ -476,9 +476,6 @@ export default {
     },
     methods: {
         handleRemove (file, fileList) {
-            console.log(file);
-            console.log(fileList);
-
             this.faceIDCardsImgList = fileList;
         },
         handlePictureCardPreview (file) {
@@ -498,7 +495,6 @@ export default {
                 ExpressIMG: JSON.stringify(IMGobj),
                 InquiryID: this.inquiryID
             }
-            console.log(paramObj);
 
             let res = await this.postData("A1045", paramObj);
             if (res.code == '0') {
@@ -527,8 +523,6 @@ export default {
             this.dialogVisible = true;
         },
         faceIDCardsImgListRemove (file, fileList) {
-            console.log(file);
-            console.log(fileList);
             file.name = "";
             this.faceIDCardsImgList = [];
         },
@@ -536,8 +530,6 @@ export default {
             this.inquiryID = row.inquiryID;
         },
         async queryBtn () {
-            console.log(this.inquiryName);
-
             let token = window.sessionStorage.getItem("gn_request_token");
             let paramObj = {
                 Token: token,
@@ -585,14 +577,12 @@ export default {
             let res = await this.postData("A1051", paramObj);
             let imgArr = res.res.data[0].expressIMG;
             imgArr = imgArr ? JSON.parse(imgArr) : [];
-            console.log(imgArr);
 
             for (let i = 0; i < imgArr.length; i++) {
                 this.faceIDCardsImgList.push({
                     url: imgArr[i]
                 })
             }
-            console.log(this.faceIDCardsImgList);
 
             this.examineClerkDoneDialogVisible = true;
         },
@@ -621,7 +611,6 @@ export default {
             }
 
             let res = await this.postData("A1046", paramObj);
-            console.log(res);
 
             if (res.res.data) {
                 let result = res.res.data;
@@ -653,7 +642,6 @@ export default {
                 }
                 this.tableData = tableData;
             } else {
-                console.log("没有数据");
             }
 
         },
@@ -679,7 +667,6 @@ export default {
         },
         // 导出订单
         async exportOrderFn () {
-            console.log(1);
             let token = window.sessionStorage.getItem("gn_request_token");
             let paramObj = {
                 Token: token,
@@ -700,7 +687,6 @@ export default {
             };
         },
         handleSelect (item) {
-            console.log(item);
         },
         // 关闭抽屉
         handleUploadClose () {
@@ -747,7 +733,6 @@ export default {
                     this.tableData = tableData;
                 } else {
                     this.tableData = [];
-                    console.log("没有数据");
                 }
 
             } else if (this.activeName == 'second') {
@@ -760,7 +745,6 @@ export default {
                     InquiryState: this.inquiryState
                 }
                 let res = await this.postData("A1046", paramObj);
-                console.log(res);
                 let result = res.res.data;
                 if (JSON.stringify(result) != "{}") {
                     this.currentPage = result.pageIndex;
@@ -773,7 +757,6 @@ export default {
                     this.tableData = tableData;
                 } else {
                     this.tableData = [];
-                    console.log("没有数据");
                 }
 
             } else if (this.activeName == 'third') {
@@ -786,7 +769,6 @@ export default {
                     InquiryState: this.inquiryState
                 }
                 let res = await this.postData("A1046", paramObj);
-                console.log(res);
                 let result = res.res.data;
 
                 if (JSON.stringify(result) != "{}") {
@@ -800,7 +782,6 @@ export default {
                     this.tableData = tableData;
                 } else {
                     this.tableData = [];
-                    console.log("没有数据");
                 }
 
             } else if (this.activeName == 'fourth') {
@@ -825,7 +806,6 @@ export default {
                     this.tableData = tableData;
                 } else {
                     this.tableData = [];
-                    console.log("没有数据");
                 }
             }
         }
@@ -834,17 +814,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-// .batchEditBtn {
-//     text-align: right;
-//     margin: 35px 80px 10px;
-//     padding-left: 20px;
-//     .el-button {
-//         background-color: #019794;
-//         color: #fff;
-//         border-radius: 5px;
-//     }
-// }
-
 .main {
     .quoteList {
         /deep/ .el-tabs__nav-wrap.is-top {

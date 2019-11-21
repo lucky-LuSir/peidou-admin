@@ -119,7 +119,7 @@
                                             <el-input v-model="scope.row.price" size="small"></el-input>
                                         </div>
                                         <div class="right">
-                                            <i>¥ {{ scope.row.quantity * scope.row.price }}</i>
+                                            <i>¥ {{ scope.row.quantity * scope.row.price | ToFixed }}</i>
                                         </div>
                                     </div>
                                 </template>
@@ -148,7 +148,7 @@
                                 共 {{totalNums}} 件
                             </div>
                             <div class="summary-price">
-                                合计: {{ totalPrice }}
+                                合计: {{ totalPrice | ToFixed }}
                             </div>
                         </div>
                     </div>

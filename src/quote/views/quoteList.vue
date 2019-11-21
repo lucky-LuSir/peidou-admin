@@ -604,8 +604,6 @@ export default {
     },
     props: ["homeStatus"],
     created () {
-        console.log(this.homeStatus);
-
         if (this.homeStatus == 1) {
             this.activeName = "second"
         } else if (this.homeStatus == 2) {
@@ -667,7 +665,6 @@ export default {
             }
 
             const res = await this.postData("A1024", paramObj);
-            console.log(res);
 
             if (res.code == '0') {
                 this.$message({
@@ -686,8 +683,6 @@ export default {
         },
         // 走详情
         async toRobList (item) {
-            console.log(item);
-
             let token = window.sessionStorage.getItem("gn_request_token");
 
             let paramObj = {
@@ -697,7 +692,6 @@ export default {
             const res = await this.postData("A1023", paramObj);
 
             if (res.code == '0') {
-                console.log(res);
                 if (res.res.msg == '您不是该订单的处理人，无法查看详情') {
                     this.$message({
                         type: "success",
@@ -742,7 +736,6 @@ export default {
             }
             const res = await this.postData("A1022", paramObj);
             let result = res.res.data;
-            console.log(result);
 
             this.totalNum = result.top.allCount;
             this.currentPage = result.pageIndex;
@@ -768,11 +761,9 @@ export default {
                     tCount: tableData[i] ? tableData[i].tCount : '',
                 }
             }
-            console.log(result);
 
             if (res.res.data) {
                 let result = res.res.data;
-                console.log(result);
 
                 if (result) {
                     this.topObj = {
@@ -807,7 +798,6 @@ export default {
                 }
                 this.tableData = tableData;
             } else {
-                console.log("没有数据");
                 this.tableData = [];
             }
         },
@@ -879,7 +869,6 @@ export default {
                 }
                 const res = await this.postData("A1022", paramObj);
                 let result = res.res.data;
-                console.log(result);
                 if (JSON.stringify(result) != "{}") {
                     this.totalNum = result.top.allCount;
                     this.currentPage = result.pageIndex;
@@ -926,7 +915,6 @@ export default {
                 }
                 const res = await this.postData("A1022", paramObj);
                 let result = res.res.data;
-                console.log(result);
                 if (JSON.stringify(result) != "{}") {
                     this.totalNum = result.top.allCount;
                     this.currentPage = result.pageIndex;
@@ -971,7 +959,6 @@ export default {
                 }
                 const res = await this.postData("A1022", paramObj);
                 let result = res.res.data;
-                console.log(result);
                 if (JSON.stringify(result) != "{}") {
                     this.totalNum = result.top.allCount;
                     this.currentPage = result.pageIndex;
@@ -1016,7 +1003,6 @@ export default {
                 }
                 const res = await this.postData("A1022", paramObj);
                 let result = res.res.data;
-                console.log(result);
                 if (JSON.stringify(result) != "{}") {
                     this.totalNum = result.top.allCount;
                     this.currentPage = result.pageIndex;
@@ -1062,14 +1048,11 @@ export default {
                 }
                 const res = await this.postData("A1022", paramObj);
                 let result = res.res.data;
-                console.log(result);
                 if (JSON.stringify(result) != "{}") {
                     this.totalNum = result.top.allCount;
                     this.currentPage = result.pageIndex;
-
                     let tableData = res.res.data.date;
                     for (let i = 0; i < tableData.length; i++) {
-
                         tableData[i].firstObj = {
                             inquiryID: tableData[i] ? tableData[i].inquiryID : '',
                             pictures: tableData[i].pictures ? JSON.parse(tableData[i].pictures)[0] : '',

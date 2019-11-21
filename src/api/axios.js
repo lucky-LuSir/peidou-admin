@@ -10,8 +10,8 @@ if (location.hostname === 'localhost' || location.hostname === 'devweb.saas.maoc
     baseURL = "http://uip.dev.maocongwang.com/api/UIP";
     // baseURL = "http://uip.maocongwang.com/api/UIP"
 } else {
-    baseURL = "http://uip.maocongwang.com/api/UIP"
-    // baseURL = "http://uip.dev.maocongwang.com/api/UIP";
+    // baseURL = "http://uip.maocongwang.com/api/UIP"
+    baseURL = "http://uip.dev.maocongwang.com/api/UIP";
 }
 
 

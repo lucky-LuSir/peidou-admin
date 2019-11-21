@@ -45,7 +45,7 @@
             <el-main>
                 <nav>
                     <div class="nav-header">
-                        <a class="menu-btn" href="javascript:;">
+                        <a class="menu-btn" @click="isExpand()" href="javascript:;">
                             <i class="el-icon-font-caidan"></i>
                         </a>
                     </div>
@@ -92,7 +92,6 @@ import clerkList from "../storeMan/views/clerkList"
 import quoteList from "../quote/views/quoteList"
 import quoteOrderList from "../quote/views/quoteOrderList"
 import addQuoteList from "../quote/views/addQuoteList"
-
 
 // 采购订单
 import purchaseOrderList from "../purchase/views/purchaseOrderList"
@@ -175,6 +174,11 @@ export default {
         oldOrderList,
     },
     methods: {
+        // 菜单是否展开
+        isExpand () {
+            console.log(1);
+            
+        },
         // 退出登陆
         logout () {
             console.log(1111);

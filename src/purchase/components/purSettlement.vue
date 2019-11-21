@@ -90,7 +90,7 @@
                                     </div>
                                     <div class="right">
                                         ¥
-                                        <i>{{ scope.row.quantity * scope.row.price }}</i>
+                                        <i>{{ scope.row.quantity * scope.row.price | ToFixed }}</i>
                                     </div>
                                 </div>
                             </template>
@@ -107,7 +107,7 @@
                             共 {{totalNums}} 件
                         </div>
                         <div class="summary-price">
-                            合计: {{ totalprice1 }}
+                            合计: {{ totalprice | ToFixed }}
                         </div>
                     </div>
                 </div>
@@ -186,14 +186,12 @@
 <script>
 export default {
     computed: {
-        totalprice1 () {
-            var totalprice1 = 0;
+        totalprice () {
+            var totalprice = 0;
             this.tableData.forEach((item, index) => {
-                console.log(item);
-
-                totalprice1 += item.quantity * item.price;
+                totalprice += item.quantity * item.price;
             });
-            return totalprice1;
+            return totalprice;
         },
         totalNums () {
             var totalNums = 0;

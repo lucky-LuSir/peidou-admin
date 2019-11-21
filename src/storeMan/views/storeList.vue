@@ -241,7 +241,13 @@ export default {
         },
         // 添加店员抽屉
         addClerkDialogFn (item) {
-            console.log(item);
+            if (item.stateObj.approvalState != 2) {
+                this.$message({
+                    type: "warning",
+                    message: "门店审核通过才能添加店员!!!"
+                })
+                return;
+            }
             this.addClerkForm.storeName = item.garageID;
             this.getStoreListFn();
             this.addClerkDialogVisible = true;
@@ -254,6 +260,7 @@ export default {
             }
             const res = await this.postData("A1053", paramObj);
             let storeList = res.res.data.date;
+            console.log(storeList);
             this.storeList = storeList;
             this.getStoreDetailFn();
         },

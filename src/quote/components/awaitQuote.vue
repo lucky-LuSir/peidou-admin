@@ -143,7 +143,7 @@
                                         <el-input v-model="scope.row.price" size="small"></el-input>
                                     </div>
                                     <div class="right">
-                                        <i>¥ {{ scope.row.quantity * scope.row.price }}</i>
+                                        <i>¥ {{ scope.row.quantity * scope.row.price | ToFixed }}</i>
                                     </div>
                                 </div>
                             </template>
@@ -172,7 +172,7 @@
                             共 {{totalNums}} 件
                         </div>
                         <div class="summary-price">
-                            合计: {{ totalPrice }}
+                            合计: {{ totalPrice | ToFixed }}
                         </div>
                     </div>
                 </div>
@@ -361,8 +361,6 @@ export default {
     methods: {
         async addAddressFn () {
             for (let i = 0; i < this.addressList.length; i++) {
-                console.log(this.addressList[i]);
-
                 if (this.addressList[i].address == this.addAddressObj.addName) {
                     // this.addsID = this.addressList[i].id
                     this.$message({
@@ -402,8 +400,6 @@ export default {
         },
         // 提交
         async submitFn (ruleForm) {
-            console.log(this.quoteForm.addValue);
-
             this.$refs[ruleForm].validate(async (valid) => {
                 if (valid) {
                     for (let i = 0; i < this.addressList.length; i++) {
@@ -427,8 +423,6 @@ export default {
                         Components: Components,
                         invoiceType: this.quoteForm.invoiceType
                     }
-                    console.log(paramObj);
-
 
                     const res = await this.postData("A1030", paramObj);
                     if (res.code == '0') {
@@ -489,8 +483,6 @@ export default {
             let result = res.res.data;
             this.garageID = result.inquiry.garageID;
             this.tableData = result.inquiryComponents;
-            console.log(result);
-            
             if (this.tableData.length == 0) {
                 this.tableData.push({
                     componentID: '',
@@ -517,12 +509,10 @@ export default {
             if (this.quoteForm.componentIMG) {
                 this.picArrList.push(this.quoteForm.componentIMG);
             }
-            if (this.quoteForm.expressIMG) {
-                this.picArrList.push(this.quoteForm.expressIMG);
+            if (this.quoteForm.vinCodeIMG) {
+                this.picArrList.push(this.quoteForm.vinCodeIMG);
             }
             this.getAddressList();
-            console.log(this.quoteForm);
-            
         },
         // 暂存
         async storageFn () {
@@ -547,7 +537,6 @@ export default {
                 Components: Components,
                 invoiceType: this.quoteForm.invoiceType
             }
-            console.log(paramObj);
 
             const res = await this.postData("A1030", paramObj);
             if (res.code == '0') {
