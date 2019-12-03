@@ -1,30 +1,31 @@
 <template>
-    <!-- 采购订单 -->
+    <!-- 退货管理 -->
     <div class="root">
         <Header :headerInfo="headerInfo"></Header>
         <div class="com-search-list">
-            <el-autocomplete style="margin-right: 45px;" size="small" class="inline-input" v-model="inquiryName" :fetch-suggestions="querySearch" placeholder="请输入门店名称/询价编号" @select="handleSelect"></el-autocomplete>
-            下单时间:
+            <el-autocomplete style="margin-right: 45px;" size="small" class="inline-input" v-model="inquiryName" :fetch-suggestions="querySearch" placeholder="退单编号/门店名称" @select="handleSelect"></el-autocomplete>
+            退货申请时间：
             <el-date-picker unlink-panels style="margin-right: 22px;" size="small" v-model="inquiryDate" type="monthrange" range-separator="至" start-placeholder="开始月份" end-placeholder="结束月份">
             </el-date-picker>
             <el-button @click="queryBtn()" size="small">
                 <i class="el-icon-font-sousuo"></i>查询</el-button>
         </div>
-        <div class="com-addBtn-list">
-            <el-button style="background-color: #019794; border: 1px solid #019794; width: 140px;" @click="exportOrderFn()" type="primary" size="small">导出订单</el-button>
+        <div class="com-addBtn-list clearfix">
+            <el-button style="width: 100px; margin-right: 40px;" class="fr" @click="submitFn()" type="primary" size="small">通过</el-button>
+            <el-button style="width: 100px; margin-right: 40px;" class="fr" @click="rejectFn()" type="danger" size="small">拒绝</el-button>
         </div>
         <div class="main clearfix">
             <div class="quoteList">
                 <el-tabs v-model="activeName" @tab-click="handleClick">
                     <el-tab-pane :label="topObj.allCount" name="first" lazy>
-                        <el-table :data="tableData" style="width: 100%" border @row-click="clickTable">
+                        <el-table :data="tableData" style="width: 100%" border @selection-change="handleSelectionChange">
                             <el-table-column width="35" type="selection">
                             </el-table-column>
-                            <el-table-column prop="inquiryID" label="询价编号" width="180">
+                            <el-table-column prop="refundID" label="退单编号" width="180">
                                 <template slot-scope="scope">
                                     <div class="con quoteNum">
                                         <div class="top">
-                                            <i>{{scope.row.inquiryID}}</i>
+                                            <i>{{scope.row.refundID}}</i>
                                         </div>
                                         <div class="foot">
                                             <div>
@@ -50,7 +51,7 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="handleMan" label="处理人" width="180">
+                            <el-table-column prop="handleMan" label="申请人" width="180">
                                 <template slot-scope="scope">
                                     <div class="con">
                                         <div class="top">
@@ -62,7 +63,7 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="createDateTime" label="下单时间" width="180">
+                            <el-table-column prop="createDateTime" label="退货申请时间" width="180">
                             </el-table-column>
                             <el-table-column prop="invoiceType" label="是否开票">
                                 <template slot-scope="scope">
@@ -85,13 +86,14 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="inquiryState" sortable label="订单状态" width="130">
+                            <el-table-column prop="inquiryState" label="退货状态" width="130">
                                 <template slot-scope="scope">
                                     <div class="con orderStatus">
                                         <div class="top" style="margin-bottom: 30px;">
-                                            <i style="color: #ff0000;" @click="toEditPurchase(scope.row)" v-if="scope.row.inquiryState == 1">挂账中</i>
-                                            <i style="color: #ff7e01;" @click="toEditPurchase(scope.row)" v-if="scope.row.inquiryState == 2">已结算</i>
-                                            <i style="color: #008000;" @click="toEditPurchase(scope.row)" v-if="scope.row.inquiryState == 3">已逾期</i>
+                                            <i style="color: #ff0000;" @click="toRefundDetailFn(scope.row)" v-if="scope.row.inquiryState == 1">待审核</i>
+                                            <i style="color: #ff7e01;" @click="toRefundDetailFn(scope.row)" v-if="scope.row.inquiryState == 2">待抵扣</i>
+                                            <i style="color: #008000;" @click="toRefundDetailFn(scope.row)" v-if="scope.row.inquiryState == 3">审核不通过</i>
+                                            <i style="color: #008000;" @click="toRefundDetailFn(scope.row)" v-if="scope.row.inquiryState == 4">已抵扣</i>
                                         </div>
                                         <div style="color: #333;" class="foot">
                                             <p style="line-height: 20px;">共{{scope.row.tCount}}件</p>
@@ -104,16 +106,9 @@
                             </el-table-column>
                             <el-table-column label="操作" width="190">
                                 <template slot-scope="scope">
-                                    <div v-if="scope.row.inquiryState == 1 && scope.row.expressState == 1" class="con operateList">
-                                        <div class="top">
-                                            <i style="cursor: pointer;" @click="toEditPurchase(scope.row)">查看详情</i>
-                                        </div>
-                                        <div class="foot">
-                                            <el-button @click="expressIMGFn(scope.row)" size="mini">上传物流凭证</el-button>
-                                        </div>
-                                    </div>
-                                    <div v-if="scope.row.inquiryState != 1 || scope.row.expressState == 2" class="center">
-                                        <i style="cursor: pointer; color: #0033cf;" @click="toEditPurchase(scope.row)">查看详情</i>
+                                    <div class="center opera">
+                                        <a href="javascript:;" @click="toRefundDetailFn(scope.row)">查看详情</a>
+                                        <a href="javascript:;" @click="toOlderOrderFn(scope.row)">查看原订单</a>
                                     </div>
                                 </template>
                             </el-table-column>
@@ -122,17 +117,21 @@
                         </el-pagination>
                     </el-tab-pane>
                     <el-tab-pane :label="topObj.saymentNO" name="second" lazy>
-                        <el-table :data="tableData" style="width: 100%" border>
+                        <el-table :data="tableData" style="width: 100%" border @selection-change="handleSelectionChange">
                             <el-table-column width="35" type="selection">
                             </el-table-column>
-                            <el-table-column prop="inquiryID" label="询价编号" width="180">
+                            <el-table-column prop="refundID" label="退单编号" width="180">
                                 <template slot-scope="scope">
                                     <div class="con quoteNum">
                                         <div class="top">
-                                            <i>{{scope.row.inquiryID}}</i>
+                                            <i>{{scope.row.refundID}}</i>
                                         </div>
                                         <div class="foot">
-                                            <img :src="scope.row.picObj.pics" alt="">
+                                            <div>
+                                                <viewer style="width: 84px;height: 75px;border: 1px solid #dee1e6;">
+                                                    <img :src="scope.row.picObj.pics" alt="">
+                                                </viewer>
+                                            </div>
                                         </div>
                                     </div>
                                 </template>
@@ -151,7 +150,7 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="handleMan" label="处理人" width="180">
+                            <el-table-column prop="handleMan" label="申请人" width="180">
                                 <template slot-scope="scope">
                                     <div class="con">
                                         <div class="top">
@@ -163,7 +162,7 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="createDateTime" label="下单时间" width="180">
+                            <el-table-column prop="createDateTime" label="退货申请时间" width="180">
                             </el-table-column>
                             <el-table-column prop="invoiceType" label="是否开票">
                                 <template slot-scope="scope">
@@ -186,13 +185,14 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="inquiryState" label="订单状态" width="130">
+                            <el-table-column prop="inquiryState" label="退货状态" width="130">
                                 <template slot-scope="scope">
                                     <div class="con orderStatus">
                                         <div class="top" style="margin-bottom: 30px;">
-                                            <i style="color: #ff0000;" @click="toEditPurchase(scope.row)" v-if="scope.row.inquiryState == 1">挂账中</i>
-                                            <i style="color: #ff7e01;" @click="toEditPurchase(scope.row)" v-if="scope.row.inquiryState == 2">已结算</i>
-                                            <i style="color: #008000;" @click="toEditPurchase(scope.row)" v-if="scope.row.inquiryState == 3">已逾期</i>
+                                            <i style="color: #ff0000;" @click="toRefundDetailFn(scope.row)" v-if="scope.row.inquiryState == 1">待审核</i>
+                                            <i style="color: #ff7e01;" @click="toRefundDetailFn(scope.row)" v-if="scope.row.inquiryState == 2">待抵扣</i>
+                                            <i style="color: #008000;" @click="toRefundDetailFn(scope.row)" v-if="scope.row.inquiryState == 3">审核不通过</i>
+                                            <i style="color: #008000;" @click="toRefundDetailFn(scope.row)" v-if="scope.row.inquiryState == 4">已抵扣</i>
                                         </div>
                                         <div style="color: #333;" class="foot">
                                             <p style="line-height: 20px;">共{{scope.row.tCount}}件</p>
@@ -205,13 +205,9 @@
                             </el-table-column>
                             <el-table-column label="操作" width="190">
                                 <template slot-scope="scope">
-                                    <div class="con operateList">
-                                        <div class="top">
-                                            <i style="cursor: pointer;" @click="toEditPurchase(scope.row)">查看详情</i>
-                                        </div>
-                                        <div class="foot">
-                                            <el-button @click="expressIMGFn(scope.row)" size="mini">上传物流凭证</el-button>
-                                        </div>
+                                    <div class="center opera">
+                                        <a href="javascript:;" @click="toRefundDetailFn(scope.row)">查看详情</a>
+                                        <a href="javascript:;" @click="toOlderOrderFn(scope.row)">查看原订单</a>
                                     </div>
                                 </template>
                             </el-table-column>
@@ -220,17 +216,21 @@
                         </el-pagination>
                     </el-tab-pane>
                     <el-tab-pane :label="topObj.settlementOK" name="third" lazy>
-                        <el-table :data="tableData" style="width: 100%" border>
+                        <el-table :data="tableData" style="width: 100%" border @selection-change="handleSelectionChange">
                             <el-table-column width="35" type="selection">
                             </el-table-column>
-                            <el-table-column prop="inquiryID" label="询价编号" width="180">
+                            <el-table-column prop="refundID" label="退单编号" width="180">
                                 <template slot-scope="scope">
                                     <div class="con quoteNum">
                                         <div class="top">
-                                            <i>{{scope.row.inquiryID}}</i>
+                                            <i>{{scope.row.refundID}}</i>
                                         </div>
                                         <div class="foot">
-                                            <img :src="scope.row.picObj.pics" alt="">
+                                            <div>
+                                                <viewer style="width: 84px;height: 75px;border: 1px solid #dee1e6;">
+                                                    <img :src="scope.row.picObj.pics" alt="">
+                                                </viewer>
+                                            </div>
                                         </div>
                                     </div>
                                 </template>
@@ -249,7 +249,7 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="handleMan" label="处理人" width="180">
+                            <el-table-column prop="handleMan" label="申请人" width="180">
                                 <template slot-scope="scope">
                                     <div class="con">
                                         <div class="top">
@@ -261,7 +261,7 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="createDateTime" label="下单时间" width="180">
+                            <el-table-column prop="createDateTime" label="退货申请时间" width="180">
                             </el-table-column>
                             <el-table-column prop="invoiceType" label="是否开票">
                                 <template slot-scope="scope">
@@ -284,13 +284,14 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="inquiryState" label="订单状态" width="130">
+                            <el-table-column prop="inquiryState" label="退货状态" width="130">
                                 <template slot-scope="scope">
                                     <div class="con orderStatus">
                                         <div class="top" style="margin-bottom: 30px;">
-                                            <i style="color: #ff0000;" @click="toEditPurchase(scope.row)" v-if="scope.row.inquiryState == 1">挂账中</i>
-                                            <i style="color: #ff7e01;" @click="toEditPurchase(scope.row)" v-if="scope.row.inquiryState == 2">已结算</i>
-                                            <i style="color: #008000;" @click="toEditPurchase(scope.row)" v-if="scope.row.inquiryState == 3">已逾期</i>
+                                            <i style="color: #ff0000;" @click="toRefundDetailFn(scope.row)" v-if="scope.row.inquiryState == 1">待审核</i>
+                                            <i style="color: #ff7e01;" @click="toRefundDetailFn(scope.row)" v-if="scope.row.inquiryState == 2">待抵扣</i>
+                                            <i style="color: #008000;" @click="toRefundDetailFn(scope.row)" v-if="scope.row.inquiryState == 3">审核不通过</i>
+                                            <i style="color: #008000;" @click="toRefundDetailFn(scope.row)" v-if="scope.row.inquiryState == 4">已抵扣</i>
                                         </div>
                                         <div style="color: #333;" class="foot">
                                             <p style="line-height: 20px;">共{{scope.row.tCount}}件</p>
@@ -303,13 +304,9 @@
                             </el-table-column>
                             <el-table-column label="操作" width="190">
                                 <template slot-scope="scope">
-                                    <div class="con operateList">
-                                        <div class="top">
-                                            <i style="cursor: pointer;" @click="toEditPurchase(scope.row)">查看详情</i>
-                                        </div>
-                                        <div class="foot">
-                                            <el-button @click="expressIMGFn(scope.row)" size="mini">上传物流凭证</el-button>
-                                        </div>
+                                    <div class="center opera">
+                                        <a href="javascript:;" @click="toRefundDetailFn(scope.row)">查看详情</a>
+                                        <a href="javascript:;" @click="toOlderOrderFn(scope.row)">查看原订单</a>
                                     </div>
                                 </template>
                             </el-table-column>
@@ -318,17 +315,21 @@
                         </el-pagination>
                     </el-tab-pane>
                     <el-tab-pane :label="topObj.overdue" name="fourth" lazy>
-                        <el-table :data="tableData" style="width: 100%" border>
+                        <el-table :data="tableData" style="width: 100%" border @selection-change="handleSelectionChange">
                             <el-table-column width="35" type="selection">
                             </el-table-column>
-                            <el-table-column prop="inquiryID" label="询价编号" width="180">
+                            <el-table-column prop="refundID" label="退单编号" width="180">
                                 <template slot-scope="scope">
                                     <div class="con quoteNum">
                                         <div class="top">
-                                            <i>{{scope.row.inquiryID}}</i>
+                                            <i>{{scope.row.refundID}}</i>
                                         </div>
                                         <div class="foot">
-                                            <img :src="scope.row.picObj.pics" alt="">
+                                            <div>
+                                                <viewer style="width: 84px;height: 75px;border: 1px solid #dee1e6;">
+                                                    <img :src="scope.row.picObj.pics" alt="">
+                                                </viewer>
+                                            </div>
                                         </div>
                                     </div>
                                 </template>
@@ -347,7 +348,7 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="handleMan" label="处理人" width="180">
+                            <el-table-column prop="handleMan" label="申请人" width="180">
                                 <template slot-scope="scope">
                                     <div class="con">
                                         <div class="top">
@@ -359,7 +360,7 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="createDateTime" label="下单时间" width="180">
+                            <el-table-column prop="createDateTime" label="退货申请时间" width="180">
                             </el-table-column>
                             <el-table-column prop="invoiceType" label="是否开票">
                                 <template slot-scope="scope">
@@ -382,13 +383,14 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="inquiryState" label="订单状态" width="130">
+                            <el-table-column prop="inquiryState" label="退货状态" width="130">
                                 <template slot-scope="scope">
                                     <div class="con orderStatus">
                                         <div class="top" style="margin-bottom: 30px;">
-                                            <i style="color: #ff0000;" @click="toEditPurchase(scope.row)" v-if="scope.row.inquiryState == 1">挂账中</i>
-                                            <i style="color: #ff7e01;" @click="toEditPurchase(scope.row)" v-if="scope.row.inquiryState == 2">已结算</i>
-                                            <i style="color: #008000;" @click="toEditPurchase(scope.row)" v-if="scope.row.inquiryState == 3">已逾期</i>
+                                            <i style="color: #ff0000;" @click="toRefundDetailFn(scope.row)" v-if="scope.row.inquiryState == 1">待审核</i>
+                                            <i style="color: #ff7e01;" @click="toRefundDetailFn(scope.row)" v-if="scope.row.inquiryState == 2">待抵扣</i>
+                                            <i style="color: #008000;" @click="toRefundDetailFn(scope.row)" v-if="scope.row.inquiryState == 3">审核不通过</i>
+                                            <i style="color: #008000;" @click="toRefundDetailFn(scope.row)" v-if="scope.row.inquiryState == 4">已抵扣</i>
                                         </div>
                                         <div style="color: #333;" class="foot">
                                             <p style="line-height: 20px;">共{{scope.row.tCount}}件</p>
@@ -401,13 +403,9 @@
                             </el-table-column>
                             <el-table-column label="操作" width="190">
                                 <template slot-scope="scope">
-                                    <div class="con operateList">
-                                        <div class="top">
-                                            <i style="cursor: pointer;" @click="toEditPurchase(scope.row)">查看详情</i>
-                                        </div>
-                                        <div class="foot">
-                                            <el-button @click="expressIMGFn(scope.row)" size="mini">上传物流凭证</el-button>
-                                        </div>
+                                    <div class="center opera">
+                                        <a href="javascript:;" @click="toRefundDetailFn(scope.row)">查看详情</a>
+                                        <a href="javascript:;" @click="toOlderOrderFn(scope.row)">查看原订单</a>
                                     </div>
                                 </template>
                             </el-table-column>
@@ -418,17 +416,6 @@
                 </el-tabs>
             </div>
         </div>
-        <el-drawer title="物流凭证" :before-close="handleUploadClose" :visible.sync="examineClerkDoneDialogVisible" direction="rtl" custom-class="addClerkDrawer" ref="drawer" size="50%">
-            <div class="demo-drawer__content">
-                <el-upload :limit="3" action="#" list-type="picture-card" :file-list="faceIDCardsImgList" :on-preview="handlePictureCardPreview" :on-remove="handleRemove" :http-request="faceIDCardsFn">
-                    <i class="el-icon-plus"></i>
-                </el-upload>
-                <el-dialog :visible.sync="dialogVisible">
-                    <img width="100%" :src="dialogImageUrl" alt="">
-                </el-dialog>
-                <el-button class="uploadBtn" type="primary" @click="updateFn()">上传</el-button>
-            </div>
-        </el-drawer>
     </div>
 </template>
 
@@ -438,89 +425,63 @@ import Header from "../../components/Header"
 export default {
     data () {
         return {
-            headerInfo: '询价报价',
+            headerInfo: '退货管理',
             inquiryName: '',
             inquiryDate: '',
             restaurants: [],
             activeName: 'first',
             tableData: [],
-            fileList: [],
             currentPage: 1,
             pageSize: 10,
             totalNum: 0,
-            inquiryID: '',
-            expressIMG: '', // 物流凭证
+            refundID: '',
             topObj: {
                 allCount: '全部状态(0)',
-                settlementOK: '已结算(0)',
                 saymentNO: '挂账中(0)',
-                overdue: '已逾期(0)',
+                settlementOK: '已结算(0)',
+                overdue: '已逾期(0)'
             },
             inquiryState: '',
-            dialogVisible: false,
-            addrIMGS: "",
-            faceIDCardsImgList: [],
-            dialogImageUrl: '',
-            examineClerkDoneDialogVisible: false,
-            disabled: false,
-            faceIDCardsImg: '',
-            dialogImageUrl: '',
-            dialogVisible: false
+            multipleSelection: [],
         }
     },
     components: {
         Header,
     },
     created () {
-        this.getPurchaseOrderList();
+        this.getRefundListFn();
     },
     methods: {
-        handleRemove (file, fileList) {
-            this.faceIDCardsImgList = fileList;
+        // 回原订单
+        toOlderOrderFn (item) {
+            window.sessionStorage.setItem("refundID", item.inquiryID);
+            let data = {
+                menuName: '采购订单详情',
+                item: 'refundOlder',
+            };
+            this.$emit('backParam', data);
         },
-        // 上传
-        async updateFn () {
-            let IMGobj = [];
-            for (let i = 0; i < this.faceIDCardsImgList.length; i++) {
-                IMGobj.push(this.faceIDCardsImgList[i].url)
-            }
+        // 拒绝
+        rejectFn () {
 
-            let token = window.sessionStorage.getItem("gn_request_token");
-            let paramObj = {
-                Token: token,
-                ExpressIMG: JSON.stringify(IMGobj),
-                InquiryID: this.inquiryID
-            }
+        },
+        // 通过
+        submitFn () {
+            // let token = window.sessionStorage.getItem("gn_request_token");
+            // let paramObj = {
+            //     Token: token,
+            //     pageIndex: pageindex,
+            //     PageSize: this.pageSize,
+            // }
+            // console.log(paramObj);
 
-            let res = await this.postData("A1045", paramObj);
-            if (res.code == '0') {
-                this.$message({
-                    type: "success",
-                    message: res.res.msg
-                })
-                this.examineClerkDoneDialogVisible = false;
-            }
+            // let res = await this.postData("A1057", paramObj);
         },
-        // 图片上传
-        faceIDCardsFn (file) {
-            this.ajaxFile("1002", { caller: "Garage" }, file.file, async (res) => {
-                if (res.code == 0) {
-                    this.faceIDCardsImg = res.res.data[0].imageUrl;
-                    this.faceIDCardsImgList.push({
-                        url: this.faceIDCardsImg
-                    })
-                } else {
-                    this.$message.error(res.res.msg);
-                }
-            })
+        handleSelectionChange (val) {
+            console.log(val);
+            this.multipleSelection = val;
         },
-        handlePictureCardPreview (file) {
-            this.dialogImageUrl = file.url;
-            this.dialogVisible = true;
-        },
-        clickTable (row, index, e) {
-            this.inquiryID = row.inquiryID;
-        },
+        // 查询
         async queryBtn () {
             let token = window.sessionStorage.getItem("gn_request_token");
             let paramObj = {
@@ -557,37 +518,18 @@ export default {
             }
             this.tableData = tableData;
         },
-        // 打开抽屉
-        async expressIMGFn (item) {
-            this.faceIDCardsImgList = [];
-            this.InquiryID = item.inquiryID;
-            let token = window.sessionStorage.getItem("gn_request_token");
-            let paramObj = {
-                Token: token,
-                InquiryID: this.InquiryID,
-            }
-            let res = await this.postData("A1051", paramObj);
-            let imgArr = res.res.data[0].expressIMG;
-            imgArr = imgArr ? JSON.parse(imgArr) : [];
-
-            for (let i = 0; i < imgArr.length; i++) {
-                this.faceIDCardsImgList.push({
-                    url: imgArr[i]
-                })
-            }
-
-            this.examineClerkDoneDialogVisible = true;
-        },
         // 切换分页
         handleCurrentChange (val) {
-            this.getPurchaseOrderList({
+            this.getRefundListFn({
                 val: val,
                 ParamData: '',
                 InquiryState: '',
             })
         },
         // 获取订单列表
-        async getPurchaseOrderList (listObj) {
+        async getRefundListFn (listObj) {
+            console.log(listObj);
+
             let pageindex
             if (listObj) {
                 pageindex = listObj.val ? listObj.val : 1;
@@ -599,12 +541,12 @@ export default {
                 Token: token,
                 pageIndex: pageindex,
                 PageSize: this.pageSize,
-                inquiryState: this.inquiryState ? this.inquiryState : ''
             }
 
-            let res = await this.postData("A1046", paramObj);
+            let res = await this.postData("A1055", paramObj);
+            console.log(res);
 
-            if (res.res.data) {
+            if (JSON.stringify(res.res.data) != "{}") {
                 let result = res.res.data;
 
                 if (result) {
@@ -637,35 +579,19 @@ export default {
             }
 
         },
-        // 上传物流凭证改变
-        handleChange (file, fileList) {
-            this.fileList = fileList.slice(-3);
-        },
         // 查看详情
-        toEditPurchase (item) {
-            this.inquiryID = item.inquiryID;
-            let purInfoObj = {
-                inquiryID: item.inquiryID,
+        toRefundDetailFn (item) {
+            this.refundID = item.refundID;
+            let RefundObj = {
                 inquiryState: item.inquiryState,
-                expressState: item.expressState,
+                RefundID: item.refundID
             }
-            window.sessionStorage.setItem("purInfoObj", JSON.stringify(purInfoObj));
-
+            window.sessionStorage.setItem("RefundObj", JSON.stringify(RefundObj));
             let data = {
-                menuName: '采购订单详情',
-                item: 'purchaseOrderDetail',
+                menuName: '退货详情',
+                item: 'refundListDetail',
             };
             this.$emit('backParam', data);
-        },
-        // 导出订单
-        async exportOrderFn () {
-            let token = window.sessionStorage.getItem("gn_request_token");
-            let paramObj = {
-                Token: token,
-            }
-            let res = await this.postData("A1050", paramObj);
-            let url = res.res.data.fileUrl;
-            window.open(url)
         },
         querySearch (queryString, cb) {
             var restaurants = this.restaurants;
@@ -680,41 +606,23 @@ export default {
         },
         handleSelect (item) {
         },
-        // 关闭抽屉
-        handleUploadClose () {
-            this.faceIDCardsImgList = [];
-            this.examineClerkDoneDialogVisible = false;
-        },
         async handleClick (tab, event) {
+
             if (this.activeName == 'first') {
                 let token = window.sessionStorage.getItem("gn_request_token");
                 let paramObj = {
                     Token: token,
                     pageIndex: 1,
                     PageSize: this.pageSize,
+                    TopState: 1
                 }
-                let res = await this.postData("A1046", paramObj);
-                let result = res.res.data;
-                if (JSON.stringify(result) != "{}") {
 
-                    if (result) {
-                        this.topObj = {
-                            allCount: '全部状态(' + result.top.allCount + ')',
-                            settlementOK: '已结算(' + result.top.settlementOK + ')',
-                            saymentNO: '挂账中(' + result.top.saymentNO + ')',
-                            overdue: '已逾期(' + result.top.overdue + ')',
-                        }
-                    }
+                let res = await this.postData("A1055", paramObj);
+                console.log(res);
 
-                    if (this.activeName == 'first') {
-                        this.totalNum = result.top.allCount || 0;
-                    } else if (this.activeName == 'second') {
-                        this.totalNum = result.top.saymentNO || 0;
-                    } else if (this.activeName == 'third') {
-                        this.totalNum = result.top.settlementOK || 0;
-                    } else if (this.activeName == 'fourth') {
-                        this.totalNum = result.top.overdue || 0;
-                    }
+                if (JSON.stringify(res.res.data) != "{}") {
+                    let result = res.res.data;
+
                     this.currentPage = result.pageIndex;
                     let tableData = result.date;
                     for (let i = 0; i < tableData.length; i++) {
@@ -724,21 +632,27 @@ export default {
                     }
                     this.tableData = tableData;
                 } else {
+                    this.$message({
+                        type: "error",
+                        message: "没有数据"
+                    })
                     this.tableData = [];
                 }
-
             } else if (this.activeName == 'second') {
-                this.inquiryState = '1';
                 let token = window.sessionStorage.getItem("gn_request_token");
                 let paramObj = {
                     Token: token,
                     pageIndex: 1,
                     PageSize: this.pageSize,
-                    InquiryState: this.inquiryState
+                    TopState: 2
                 }
-                let res = await this.postData("A1046", paramObj);
-                let result = res.res.data;
-                if (JSON.stringify(result) != "{}") {
+
+                let res = await this.postData("A1055", paramObj);
+                console.log(res);
+
+                if (JSON.stringify(res.res.data) != "{}") {
+                    let result = res.res.data;
+
                     this.currentPage = result.pageIndex;
                     let tableData = result.date;
                     for (let i = 0; i < tableData.length; i++) {
@@ -748,22 +662,26 @@ export default {
                     }
                     this.tableData = tableData;
                 } else {
+                    this.$message({
+                        type: "error",
+                        message: "没有数据"
+                    })
                     this.tableData = [];
                 }
-
             } else if (this.activeName == 'third') {
-                this.inquiryState = '2';
                 let token = window.sessionStorage.getItem("gn_request_token");
                 let paramObj = {
                     Token: token,
                     pageIndex: 1,
                     PageSize: this.pageSize,
-                    InquiryState: this.inquiryState
+                    TopState: 2
                 }
-                let res = await this.postData("A1046", paramObj);
-                let result = res.res.data;
 
-                if (JSON.stringify(result) != "{}") {
+                let res = await this.postData("A1055", paramObj);
+
+                if (JSON.stringify(res.res.data) != "{}") {
+                    let result = res.res.data;
+
                     this.currentPage = result.pageIndex;
                     let tableData = result.date;
                     for (let i = 0; i < tableData.length; i++) {
@@ -773,21 +691,27 @@ export default {
                     }
                     this.tableData = tableData;
                 } else {
+                    this.$message({
+                        type: "error",
+                        message: "没有数据"
+                    })
                     this.tableData = [];
                 }
-
             } else if (this.activeName == 'fourth') {
-                this.inquiryState = '3'
                 let token = window.sessionStorage.getItem("gn_request_token");
                 let paramObj = {
                     Token: token,
                     pageIndex: 1,
                     PageSize: this.pageSize,
-                    InquiryState: this.inquiryState
+                    TopState: 2
                 }
-                let res = await this.postData("A1046", paramObj);
-                let result = res.res.data;
-                if (JSON.stringify(result) != "{}") {
+
+                let res = await this.postData("A1055", paramObj);
+                console.log(res);
+
+                if (JSON.stringify(res.res.data) != "{}") {
+                    let result = res.res.data;
+
                     this.currentPage = result.pageIndex;
                     let tableData = result.date;
                     for (let i = 0; i < tableData.length; i++) {
@@ -796,7 +720,13 @@ export default {
                         }
                     }
                     this.tableData = tableData;
+                    console.log(this.tableData);
+
                 } else {
+                    this.$message({
+                        type: "error",
+                        message: "没有数据"
+                    })
                     this.tableData = [];
                 }
             }
@@ -857,6 +787,12 @@ export default {
                 width: 42px;
                 height: 37px;
                 background-color: #ccc;
+            }
+        }
+        .opera {
+            justify-content: space-between;
+            a {
+                color: #409eff;
             }
         }
     }

@@ -53,8 +53,10 @@
                     </div>
                 </div>
                 <div class="parts-content">
-                    <el-table :data="tableData">
+                    <el-table :data="tableData" @selection-change="handleSelectionChange" ref="multipleTable">
                         <el-table-column type="index" width="50" label="序号">
+                        </el-table-column>
+                        <el-table-column type="selection" width="55">
                         </el-table-column>
                         <el-table-column prop="partName" label="配件名称" width="180">
                             <template slot-scope="scope">
@@ -68,7 +70,7 @@
                         </el-table-column>
                         <el-table-column prop="quantity" label="数量" width="120">
                             <template slot-scope="scope">
-                                {{scope.row.quantity}}
+                                <el-input-number style="width: 90px;" v-model="scope.row.quantity" size="small" controls-position="right" @change="handleChange" :min="1" :max="scope.row.maxNum"></el-input-number>
                             </template>
                         </el-table-column>
                         <el-table-column prop="specification" label="品质" width="120">
@@ -104,12 +106,15 @@
                     </el-table>
                     <div class="table-summary">
                         <div class="summary-num">
-                            共 {{totalNums}} 件
+                            共{{totalNums}}件
                         </div>
                         <div class="summary-price">
                             合计: {{ totalprice | ToFixed }}
                         </div>
                     </div>
+                </div>
+                <div style="width: 1024px; text-align: center;" class="refundBtn">
+                    <el-button @click="applyRefundFn()" type="primary" style="width: 300px; margin: 30px 0;">申请退货</el-button>
                 </div>
             </div>
             <div class="carInfo">
@@ -162,10 +167,6 @@
                         <i class="_label14">最后付款时间：</i>
                         {{quoteForm.expireDatetime}}
                     </div>
-                    <!-- <div class="_width280">
-                        <i class="_label14">付款时间：</i>
-                        {{quoteForm.expireDatetime}}
-                    </div> -->
                 </div>
             </div>
 
@@ -209,6 +210,7 @@ export default {
                 isAccounts: "1"
             },
             IMGS: [],
+            maxNum: 100,
         }
     },
     created () {
@@ -217,6 +219,59 @@ export default {
         this.getDetailFn();
     },
     methods: {
+        // 申请退货
+        applyRefundFn () {
+            if (this.multipleSelection.length <= 0) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择要退货商品!"
+                })
+                return;
+            }
+            let myObj = [];
+            for (let i = 0; i < this.multipleSelection.length; i++) {
+                myObj.push({
+                    ComponentID: this.multipleSelection[i].componentID,
+                    quantity: this.multipleSelection[i].quantity
+                })
+            }
+            this.$confirm('你确定申请退货吗?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(async () => {
+                let token = window.sessionStorage.getItem("gn_request_token");
+                let paramObj = {
+                    Token: token,
+                    RefundComponentData: myObj
+                }
+                let res = await this.postData("A1054", paramObj);
+                if (res.code == 0) {
+                    this.$message({
+                        type: 'success',
+                        message: res.res.msg
+                    });
+                    let data = {
+                        menuName: '退货管理',
+                        item: 'refundList',
+                    };
+                    this.$emit('purBack', data);
+                }
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消'
+                });
+            });
+        },
+        // 选择表格
+        handleSelectionChange (val) {
+            console.log(val);
+            this.multipleSelection = val;
+        },
+        // 计数器
+        handleChange (value) {
+        },
         async getDetailFn () {
             let token = window.sessionStorage.getItem("gn_request_token");
             let paramObj = {

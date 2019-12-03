@@ -1,7 +1,16 @@
 <template>
     <div class="root">
         <div class="logo">
-            <img src="../../assets/Logoslogan2.png" alt="">
+            <!-- <img src="../../assets/Logoslogan2.png" alt=""> -->
+            <div class="logo_view">
+                <div class="left">
+                    <img src="../../assets/144X144.png" alt="">
+                </div>
+                <div class="right">
+                    <span>PEI DOU TECH</span>
+                    <p>配兜科技</p>
+                </div>
+            </div>
         </div>
         <div class="container">
             <div class="row">
@@ -288,6 +297,8 @@ export default {
 </script>
 
 <style lang="less" scoped>
+//  style=""
+
 .root {
     background-image: url('../../assets/Bg2.png');
     height: 100vh;
@@ -298,6 +309,28 @@ export default {
         top: 57px;
         left: 69px;
         z-index: 100;
+        .logo_view {
+            display: flex;
+            .left {
+                img {
+                    width: 83px; 
+                    height: 83px;
+                }
+            }
+            .right {
+                margin-left: 20px;
+                text-align: left;
+                padding-top: 10px;
+                span {
+                    color: #fff;
+                    font-size: 28px;
+                }
+                p {
+                    font-size: 28px;
+                    color: #fff;
+                }
+            }
+        }
     }
     .container {
         display: table;

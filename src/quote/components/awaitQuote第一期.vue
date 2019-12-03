@@ -12,14 +12,10 @@
         <el-form :model="quoteForm" :rules="rules" ref="ruleForm" label-width="100px" class="main clearfix">
             <div class="main-left">
                 <div class="slide-wrapper">
-                    <viewer @click.native="aaa()" class="views">
-                        <div class="middle_img" id="middle_img" @mouseover="boxMouseOver" @mouseleave="boxMouseLeave">
-                            <el-image style="width: 100px; height: 100px" :src="middleImg" :fit="fit"></el-image>
-                            <!-- <img :src="middleImg" alt=""> -->
-                            <div class="shade" @mouseover="shadeMouseOver" @mousemove="shadeMouseMove" ref="shade" v-show="isShade"></div>
-                            <!-- <div class="scalc"></div> -->
-                        </div>
-                    </viewer>
+                    <div class="middle_img" @mouseover="boxMouseOver" @mouseleave="boxMouseLeave">
+                        <el-image style="width: 100px; height: 100px" :src="middleImg" :fit="fit"></el-image>
+                        <div class="shade" @mouseover="shadeMouseOver" @mousemove="shadeMouseMove" ref="shade" v-show="isShade"></div>
+                    </div>
                     <div class="carousel">
                         <div class="left_arrow arrow" @click="leftArrowClick">
                             <i class="el-icon-arrow-left"></i>
@@ -27,7 +23,7 @@
                         <div class="show_box">
                             <ul class="picture_container" ref="middlePicture">
                                 <li class="picture_item" @mouseover="tabPicture(item)" v-for="(item, index) in pictureList" :key="index">
-                                    <img :src="item" class="small_img" alt="">
+                                    <img :src="item.url" class="small_img" alt="">
                                 </li>
                             </ul>
                         </div>
@@ -53,7 +49,7 @@
                         </el-col>
                         <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                             <el-form-item style="text-align: left; margin-left: -55px;" label="VIN：" prop="vinCode">
-                                <el-input class="VINCLASS VINCODES" size="small" v-model="quoteForm.vinCode" autofocus  placeholder="请输入VIN"></el-input>
+                                <el-input class="VINCLASS VINCODES" size="small" v-model="quoteForm.vinCode" placeholder="请输入VIN"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -97,8 +93,8 @@
                     </el-row>
                     <el-row class="invoice">
                         <el-col style="padding-left: 20px;" class="maxLh" :xs="24" :sm="24" :md="12" :lg="24" :xl="24">
-                            <el-form-item label="发票:" prop="InvoiceType">
-                                <el-radio-group v-model="quoteForm.InvoiceType">
+                            <el-form-item label="发票:" prop="invoiceType">
+                                <el-radio-group v-model="quoteForm.invoiceType">
                                     <el-radio :label="1">无票</el-radio>
                                     <el-radio :label="2">普票</el-radio>
                                     <el-radio :label="3">专票</el-radio>
@@ -242,7 +238,7 @@ export default {
                 vinCode: '', // VIN
                 expireDatetime: '', //最后付款日期
                 supplierID: '',
-                InvoiceType: "", // 发票类型
+                invoiceType: 1, // 发票类型
                 AddrID: '', // 物流ID
                 expressName: '',
                 addValue: '',
@@ -275,7 +271,7 @@ export default {
                 addValue: [
                     { required: true, message: '请输入物流地址', trigger: 'blur' },
                 ],
-                InvoiceType: [
+                invoiceType: [
                     { required: true, message: '请选择发票类型', trigger: 'change' },
                 ],
             },
@@ -333,8 +329,18 @@ export default {
             restaurants: [],
             addsID: '',
             fit: 'contain',
-            url: '',
-            pictureList: [],
+            url: 'http://img.maocongwang.com//1573810306187.png',
+            pictureList: [
+
+                { url: 'http://img.maocongwang.com//1573810306187.png' },
+                { url: 'https://outter-common.toodc.cn/pc_index_jiashan_20191119.png' },
+                { url: 'http://img.maocongwang.com//1574244208251.jpeg' },
+                { url: 'http://img.maocongwang.com//1574244208642.jpeg' },
+                { url: 'http://img.maocongwang.com//1574244208907.jpeg' },
+                { url: 'http://img.maocongwang.com//1574244209017.png' },
+                { url: 'http://img.maocongwang.com//1574244208642.jpeg' },
+                { url: 'http://img.maocongwang.com//1574244208907.jpeg' },
+            ],
             middleImg: '', // 中图图片地址
             bigImg: '', // 大图图片地址
             isShade: false, // 控制阴影显示与否
@@ -375,8 +381,15 @@ export default {
         this.inquiryID = quoteStatusObj.inquiryID;
         this.getDetailFn();
         this.getSupplierListFn();
+
+        if (this.imgList && this.imgList.length) {
+            this.pictureList = this.imgList
+        }
+        this.middleImg = this.pictureList[0].url
+        // 计算缩略图的宽度,默认是显示4张图片,两边箭头的宽度和为50
+        this.itemWidth = (this.middleImgWidth - 50) / 4
     },
-    mounted () {
+    mounted() {
         this.$nextTick(() => {
             // 容器的高
             const imgWidth = this.middleImgHeight + this.thumbnailHeight + 20
@@ -398,12 +411,20 @@ export default {
             $('.picture_item').css({
                 width: this.itemWidth
             })
+            // 设置放大后图片容器的宽高,left
+            $('.right_contanier').css({
+                left: this.middleImgWidth,
+                width: imgWidth,
+                height: imgWidth
+            })
+            // 设置放大图片的宽高(图片的放大倍数)
+            $('.right_contanier .big_img').css({
+                width: imgWidth * this.zoom,
+                height: imgWidth * this.zoom
+            })
         })
     },
     methods: {
-        aaa () {
-            console.log(1);
-        },
         // 产品图片鼠标移入事件,显示阴影,显示大图
         boxMouseOver (e) {
             e.preventDefault();
@@ -428,9 +449,7 @@ export default {
         shadeMouseMove (e) {
             e.preventDefault();
             e.stopPropagation();
-            let middle_img = document.getElementById("middle_img");
-            this.initX = middle_img.getBoundingClientRect().left;
-            this.initY = middle_img.getBoundingClientRect().top;
+            
             //用页面x - 父盒子的offsetLeft - 父盒子的左边框宽度
             var x = this.getEventPage(e).pageX - this.initX - $('.middle_img')[0].offsetParent.offsetLeft - $('.middle_img')[0].offsetParent.clientLeft;
 
@@ -438,7 +457,7 @@ export default {
             //用页面y - 父盒子的offsetTop - 父盒子的上边框宽度
             var y = this.getEventPage(e).pageY - this.initY - $('.middle_img')[0].offsetParent.offsetTop - $('.middle_img')[0].offsetParent.clientTop;
 
-
+            
             //让阴影的坐标居中
             x -= $('.shade').width() / 2;
             y -= $('.shade').height() / 2;
@@ -459,10 +478,14 @@ export default {
             // 比例为x:大图宽度/小图宽度 y: 大图高度/小图高度,将小图的定位乘以比例就是大图的定位
             const xRate = $('.big_img').width() / $('.middle_img').width()
             const yRate = $('.big_img').height() / $('.middle_img').height()
+            // console.log(xRate, yRate);
+            console.log(x, y);
+            
             $('.big_img').css({
                 left: -x * xRate,
                 top: -y * yRate
             })
+            // console.log(e, x, y, xRate, yRate, 66677)
         },
         // 鼠标移入阴影,去除自定义事件
         shadeMouseOver (e) {
@@ -476,8 +499,7 @@ export default {
         },
         // 切换图片
         tabPicture (item) {
-            console.log(item);
-            this.middleImg = item;
+            this.middleImg = item.url
         },
         // 点击左边箭头
         leftArrowClick () {
@@ -584,7 +606,7 @@ export default {
                         AddrID: this.quoteForm.addValue,
                         InquiryState: 2,
                         Components: Components,
-                        InvoiceType: this.quoteForm.InvoiceType
+                        invoiceType: this.quoteForm.invoiceType
                     }
 
                     const res = await this.postData("A1030", paramObj);
@@ -665,32 +687,17 @@ export default {
             }
             Object.assign(newObj, result.inquiry, result.inquiryInfo, result.car, result.garage, userObj, result.express, result.addr);
             this.quoteForm = newObj;
-            // if (this.quoteForm.InvoiceType == 0) {
-            //     this.quoteForm.InvoiceType = 1;
-            // }
-            if (this.quoteForm.vinCodeIMG) {
-                this.picArrList.push(this.quoteForm.vinCodeIMG);
+            if (this.quoteForm.invoiceType == 0) {
+                this.quoteForm.invoiceType = 1;
             }
-
+            this.picArrList = this.quoteForm.pictures ? JSON.parse(this.quoteForm.pictures) : [];
             if (this.quoteForm.componentIMG) {
                 this.picArrList.push(this.quoteForm.componentIMG);
             }
-            
-            if (this.quoteForm.pictures) {
-                this.picArrList.push(...JSON.parse(this.quoteForm.pictures));
+            if (this.quoteForm.vinCodeIMG) {
+                this.picArrList.push(this.quoteForm.vinCodeIMG);
             }
-
-            this.pictureList = this.picArrList;
-
-            if (this.imgList && this.imgList.length) {
-                this.pictureList = this.imgList
-            }
-            this.middleImg = this.pictureList[0]
-            // 计算缩略图的宽度,默认是显示4张图片,两边箭头的宽度和为50
-            this.itemWidth = (this.middleImgWidth - 50) / 4
-
             this.getAddressList();
-
         },
         // 暂存
         async storageFn () {
@@ -713,7 +720,7 @@ export default {
                 AddrID: this.quoteForm.addValue,
                 InquiryState: 5,
                 Components: Components,
-                InvoiceType: this.quoteForm.InvoiceType
+                invoiceType: this.quoteForm.invoiceType
             }
 
             const res = await this.postData("A1030", paramObj);
@@ -975,21 +982,18 @@ export default {
                 background-color: #333333;
                 color: #bcc2ac;
                 font-size: 18px;
-                cursor: pointer;
-            }
-            .left_arrow {
-                margin-right: 9px;
-            }
+            } 
             .right_arrow {
-                margin-left: 9px;
+                margin-left: 10px;
             }
 
+            
             .show_box {
-                width: 382px;
+                width: 392px;
                 overflow: hidden;
                 position: relative;
             }
-
+            
             .picture_container {
                 width: 2000px;
                 display: flex;
@@ -999,11 +1003,8 @@ export default {
                 left: 0;
                 .picture_item {
                     width: 90px !important;
-                    height: 70px !important;
-                    margin-left: 9px;
-                }
-                .picture_item:first-child {
-                    margin-left: 0;
+                    height: 70px!important;
+                    margin-left: 10px;
                 }
                 img {
                     width: 100%;
@@ -1014,19 +1015,13 @@ export default {
     }
 }
 
-.main-right {
-    position: relative;
-}
+
 .right_contanier {
     overflow: hidden;
     position: absolute;
     top: 0;
     border: 1px solid #ccc;
     z-index: 888;
-    width: 540px;
-    height: 400px;
-    left: 0;
-    top: 0;
 }
 .right_contanier .big_img {
     position: absolute;
@@ -1034,13 +1029,7 @@ export default {
     left: 0px;
 }
 
-.scalc {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    width: 30px;
-    height: 30px;
-    background-image: url(//static.360buyimg.com/item/unite/1.0.87/components/default/preview/i/__sprite.png);
-    background-position: 0 -24px;
-}
+
+
+
 </style>

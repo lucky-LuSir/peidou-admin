@@ -27,35 +27,33 @@
                         </el-table-column>
                         <el-table-column prop="partName" label="配件名称" width="180">
                             <template slot-scope="scope">
-                                {{scope.row.partName}}
+                                <el-input v-model="scope.row.partName" size="small" placeholder="请输入配件名称"></el-input>
                             </template>
                         </el-table-column>
                         <el-table-column prop="oeCode" label="OE编号" width="180">
                             <template slot-scope="scope">
-                                {{scope.row.oeCode}}
+                                <el-input v-model="scope.row.oeCode" size="small" placeholder="请输入OE编号"></el-input>
                             </template>
                         </el-table-column>
                         <el-table-column prop="quantity" label="数量" width="120">
                             <template slot-scope="scope">
-                                {{scope.row.quantity}}
+                                <el-input-number v-model="scope.row.quantity" size="small" controls-position="right" @change="handleChange" :min="1" :max="100"></el-input-number>
                             </template>
                         </el-table-column>
                         <el-table-column prop="specification" label="品质" width="120">
                             <template slot-scope="scope">
-                                <span v-if="scope.row.specification == 1">原厂件</span>
-                                <span v-if="scope.row.specification == 2">品牌件</span>
-                                <span v-if="scope.row.specification == 3">拆车件</span>
-                                <span v-if="scope.row.specification == 4">其他</span>
-                                <span v-if="scope.row.specification == 5">无限制</span>
-                                <span v-if="scope.row.specification == 6">再制造</span>
+                                <el-select v-model="scope.row.specification" size="small" placeholder="请选择">
+                                    <el-option v-for="item in specificationList" :key="item.value" :label="item.label" :value="item.value">
+                                    </el-option>
+                                </el-select>
                             </template>
                         </el-table-column>
-                        <el-table-column prop="price" label="报价" width="240">
+                        <el-table-column prop="price" label="报价" width="280">
                             <template slot-scope="scope">
                                 <div class="quoted-price">
                                     <div class="left">
                                         <span>销售价: ¥</span>
-                                        {{scope.row.price}}
+                                        <el-input v-model="scope.row.price" size="small"></el-input>
                                     </div>
                                     <div class="right">
                                         <i>¥ {{ scope.row.quantity * scope.row.price | ToFixed }}</i>
@@ -65,8 +63,12 @@
                         </el-table-column>
                         <el-table-column prop="servicePrice" label="退货费率" width="120">
                             <template slot-scope="scope">
-                                <span v-if="scope.row.servicePrice == 0.05">5%</span>
-                                <span v-if="scope.row.servicePrice == 1">不可退货</span>
+                                <!-- <span v-if="scope.row.servicePrice == 0.05">5%</span> -->
+                                <!-- <span v-if="scope.row.servicePrice == 1">不可退货</span> -->
+                                <el-select v-model="scope.row.servicePrice" size="small" placeholder="退货费率">
+                                    <el-option v-for="item in servicePriceList" :key="item.value" :label="item.label" :value="item.value">
+                                    </el-option>
+                                </el-select>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -78,6 +80,9 @@
                             合计: {{ totalprice | ToFixed }}
                         </div>
                     </div>
+                </div>
+                <div class="editParts">
+                    <el-button @click="editPartsFn()">修改配件信息</el-button>
                 </div>
             </div>
             <div class="carInfo">
@@ -169,6 +174,42 @@ export default {
             quoteForm: {
                 isAccounts: "1"
             },
+            specificationList: [
+                {
+                    value: 2,
+                    label: '品牌件'
+                },
+                {
+                    value: 1,
+                    label: '原厂件'
+                },
+                {
+                    value: 3,
+                    label: '拆车件'
+                },
+                {
+                    value: 6,
+                    label: '再制造'
+                },
+                {
+                    value: 5,
+                    label: '无限制'
+                },
+                {
+                    value: 4,
+                    label: '其他'
+                },
+            ],
+            servicePriceList: [
+                {
+                    value: 0.05,
+                    label: '5%'
+                },
+                {
+                    value: 1,
+                    label: '不可退货'
+                }
+            ],
         }
     },
     created () {
@@ -177,6 +218,33 @@ export default {
         this.getDetailFn();
     },
     methods: {
+        // 修改配件信息
+        async editPartsFn () {
+            console.log(this.quoteForm);
+            let Components = this.tableData;
+            let token = window.sessionStorage.getItem("gn_request_token");
+            let paramObj = {
+                Token: token,
+                VinCode: this.quoteForm.vinCode,
+                SupplierID: this.quoteForm.supplierID,
+                Mark: this.quoteForm.maker,
+                ExpireDatetime: this.quoteForm.expireDatetime,
+                ExpressName: this.quoteForm.expressName,
+                AddrID: this.quoteForm.addrID,
+                InquiryState: 2,
+                Components: Components,
+                InvoiceType: this.quoteForm.invoiceType,
+                garageID: this.quoteForm.garageID
+            }
+            console.log(paramObj);
+
+            const res = await this.postData("A1038", paramObj);
+            console.log(res);
+            
+        },
+        // 计数器
+        handleChange (value) {
+        },
         async getDetailFn () {
             let token = window.sessionStorage.getItem("gn_request_token");
             let paramObj = {
@@ -229,6 +297,13 @@ export default {
                 color: #ff9900;
                 font-weight: 700;
                 font-size: 16px;
+            }
+        }
+
+        /deep/ .el-input-number {
+            width: 85px;
+            /deep/ .el-input__inner {
+                padding-left: 10px;
             }
         }
 

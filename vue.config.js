@@ -29,6 +29,10 @@ const cdn = {
 module.exports = {
     publicPath: isProduction ? "./" : "/",
     outputDir: "dist",
+    devServer: {
+        port: 8081, // 启动端口
+        open: true // 启动后是否自动打开网页
+    },
     // devServer: {
     //     before(app) {
     //         app.post("/homeList/", (req, res) => {
@@ -36,24 +40,24 @@ module.exports = {
     //         })
     //     }
     // },
-//     devServer: {
-//         // open: true,
-//         // host: 'localhost',
-//         // port: 8081,
-//         // https: false,
-//         // hotOnly: false,
-//         proxy: { // 配置跨域
-//             '/api': {
-// 　　　　　　　　　　//要访问的跨域的api的域名
-//                 target: 'http://47.102.121.209:8002/api/',
-//                 ws: true,
-//                 changOrigin: true,
-//                 pathRewrite: {
-//                     '^/api': ''
-//                 }
-//             }
-//         },
-//     },
+    //     devServer: {
+    //         // open: true,
+    //         // host: 'localhost',
+    //         // port: 8081,
+    //         // https: false,
+    //         // hotOnly: false,
+    //         proxy: { // 配置跨域
+    //             '/api': {
+    // 　　　　　　　　　　//要访问的跨域的api的域名
+    //                 target: 'http://47.102.121.209:8002/api/',
+    //                 ws: true,
+    //                 changOrigin: true,
+    //                 pathRewrite: {
+    //                     '^/api': ''
+    //                 }
+    //             }
+    //         },
+    //     },
     configureWebpack: config => {
         if (isProduction) {
             config.externals = {

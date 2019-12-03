@@ -1,5 +1,4 @@
 <template>
-    <!-- 挂账中 -->
     <div class="root">
         <div class="header">
             <div class="info clearfix">
@@ -13,13 +12,12 @@
         </div>
         <div class="main">
             <div class="logistics">
-                <div class="comInfo-top" style="display: flex;">
+                <div class="comInfo-top" style="display: flex;margin-left: 215px; color: #008000;">
                     <h2>物流信息</h2>
                     <div style="margin-left: 215px;" class="status">
-                        <span v-if="quoteForm.expressState == 1 && quoteForm.inquiryState == 1">挂账中(待发货)</span>
-                        <span v-if="quoteForm.expressState == 2 && quoteForm.inquiryState == 1">挂账中(已发货)</span>
-                        <span v-if="quoteForm.inquiryState == 2">已结算</span>
-                        <span v-if="quoteForm.inquiryState == 3">已逾期</span>
+                        <span v-if="quoteForm.orderState == 1">挂账中</span>
+                        <span v-if="quoteForm.orderState == 2">已结算</span>
+                        <span v-if="quoteForm.orderState == 3">已逾期</span>
                     </div>
                 </div>
                 <div class="comInfo-content clearfix">
@@ -29,32 +27,20 @@
                     </div>
                     <div class="_width280">
                         <i class="_label14">地址：</i>
-                        {{quoteForm.address}}
                     </div>
                 </div>
             </div>
-            <div v-if="express_state == 1" class="pinzhengInfo">
-                <div class="comInfo-top">
-                    <h2>上传物流凭证</h2>
-                </div>
-                <div class="comInfo-content clearfix">
-                    <el-upload :limit="6" action="#" :http-request="faceIDCardsFn" :file-list="faceIDCardsImgList" list-type="picture-card" :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
-                        <i class="el-icon-plus"></i>
-                    </el-upload>
-                    <el-dialog :visible.sync="dialogVisible">
-                        <img width="100%" :src="dialogImageUrl" alt="">
-                    </el-dialog>
-                    <el-button style="width: 100px; height: 40px; margin-left: 20px;" class="uploadBtn" type="primary" @click="updateFn()">上传</el-button>
-                </div>
-            </div>
-            <div v-if="express_state == 2" class="pinzhengInfo">
+            <div class="pinzhengInfo">
                 <div class="comInfo-top">
                     <h2>物流凭证</h2>
                 </div>
                 <div class="comInfo-content clearfix">
+                    <div class="imgs" v-for="(item, index) in IMGS" :key="index">
+                        <img style="width: 100px; height: 60px; margin-right: 10px;" :src="item" alt="">
+                    </div>
                     <div>
                         <viewer :images="IMGS">
-                            <img style="width: 80px; height: 80px; margin-right: 5px;" v-for="src in IMGS" :src="src" :key="src" width="50">
+                            <img v-for="src in IMGS" :src="src" :key="src" width="50">
                         </viewer>
                     </div>
                 </div>
@@ -180,8 +166,13 @@
                         <i class="_label14">最后付款时间：</i>
                         {{quoteForm.expireDatetime}}
                     </div>
+                    <!-- <div class="_width280">
+                        <i class="_label14">付款时间：</i>
+                        {{quoteForm.expireDatetime}}
+                    </div> -->
                 </div>
             </div>
+
             <div class="invoice">
                 <div class="comInfo-top">
                     <h2>发票信息</h2>
@@ -221,22 +212,14 @@ export default {
             quoteForm: {
                 isAccounts: "1"
             },
-            quoteStatus: '',
             IMGS: [],
-            express_state: 0,
-            dialogImageUrl: '',
-            dialogVisible: false,
-            faceIDCardsImgList: [],
-            multipleSelection: [],
             maxNum: 100,
         }
     },
     created () {
-        let purInfoObj = JSON.parse(window.sessionStorage.getItem("purInfoObj"))
-        this.inquiryID = purInfoObj.inquiryID;
-
+        let refundID = window.sessionStorage.getItem("refundID");
+        this.inquiryID = refundID;
         this.getDetailFn();
-        this.getExpressDetailFn();
     },
     methods: {
         // 申请退货
@@ -271,12 +254,6 @@ export default {
                         type: 'success',
                         message: res.res.msg
                     });
-                    console.log(999991);
-                    let data = {
-                        menuName: '退货管理',
-                        item: 'refundList',
-                    };
-                    this.$emit('purBack', data);
                 }
             }).catch(() => {
                 this.$message({
@@ -288,105 +265,33 @@ export default {
         // 选择表格
         handleSelectionChange (val) {
             console.log(val);
-
             this.multipleSelection = val;
         },
         // 计数器
         handleChange (value) {
         },
-        // 上传物流凭证
-        async updateFn () {
-            let IMGobj = [];
-            for (let i = 0; i < this.faceIDCardsImgList.length; i++) {
-                IMGobj.push(this.faceIDCardsImgList[i].url)
-            }
-            let token = window.sessionStorage.getItem("gn_request_token");
-            let paramObj = {
-                Token: token,
-                ExpressIMG: JSON.stringify(IMGobj),
-                inquiryID: this.inquiryID
-            }
-
-            let res = await this.postData("A1045", paramObj);
-            if (res.code == '0') {
-                this.$message({
-                    type: "success",
-                    message: res.res.msg
-                })
-            }
-        },
-        // 图片上传
-        faceIDCardsFn (file) {
-            this.ajaxFile("1002", { caller: "Garage" }, file.file, async (res) => {
-                if (res.code == 0) {
-                    this.faceIDCardsImg = res.res.data[0].imageUrl;
-                    this.faceIDCardsImgList.push({
-                        url: this.faceIDCardsImg
-                    })
-                } else {
-                    this.$message.error(res.res.msg);
-                }
-            })
-        },
-        handleRemove (file, fileList) {
-            this.faceIDCardsImgList = fileList;
-        },
-        handlePictureCardPreview (file) {
-            this.dialogImageUrl = file.url;
-            this.dialogVisible = true;
-        },
-        // 获取物流详情
-        async getExpressDetailFn () {
-            let token = window.sessionStorage.getItem("gn_request_token");
-            let paramObj = {
-                Token: token,
-                inquiryID: this.inquiryID,
-            }
-            let res = await this.postData("A1051", paramObj);
-            let imgArr = res.res.data[0].expressIMG;
-            imgArr = imgArr ? JSON.parse(imgArr) : [];
-
-            for (let i = 0; i < imgArr.length; i++) {
-                this.faceIDCardsImgList.push({
-                    url: imgArr[i]
-                })
-            }
-
-        },
-        // 获取订单详情
         async getDetailFn () {
             let token = window.sessionStorage.getItem("gn_request_token");
             let paramObj = {
                 Token: token,
-                inquiryID: this.inquiryID
+                InquiryID: this.inquiryID
             }
             let res = await this.postData("A1044", paramObj);
+            console.log(res);
+
             let result = res.res.data;
 
             this.tableData = result.inquiryComponents;
-
-            for (let i = 0; i < this.tableData.length; i++) {
-                this.tableData[i].maxNum = this.tableData[i].quantity;
-            }
-
             let newObj = {}
             let userObj = {
                 porder: result.porder,
                 userName: result.userName,
                 isAccounts: "1",
             }
-            Object.assign(newObj, result.inquiry, result.inquiryInfo, result.car, result.garage, userObj, result.express, result.addr, result.porder);
+            Object.assign(newObj, result.inquiry, result.inquiryInfo, result.car, result.garage, userObj, result.express, result.porder);
             this.quoteForm = newObj;
             if (this.quoteForm.expressIMG) {
                 this.IMGS = JSON.parse(this.quoteForm.expressIMG);
-            }
-
-            if (this.quoteForm.expressState == 1 && this.quoteForm.inquiryState == 1) {
-                this.express_state = 1;
-            } else if (this.quoteForm.expressState == 2 && this.quoteForm.inquiryState == 1) {
-                this.express_state = 2;
-            } else {
-                this.express_state = 2;
             }
         },
     },

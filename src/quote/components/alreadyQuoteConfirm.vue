@@ -217,7 +217,6 @@ export default {
             Object.assign(newObj, result.inquiry, result.inquiryInfo, result.car, result.garage, userObj, result.express, result.addr);
             this.quoteForm = newObj;
             console.log(this.quoteForm);
-            
         },
     },
 }

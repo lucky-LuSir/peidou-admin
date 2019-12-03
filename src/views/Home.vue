@@ -96,6 +96,9 @@ import addQuoteList from "../quote/views/addQuoteList"
 // 采购订单
 import purchaseOrderList from "../purchase/views/purchaseOrderList"
 import purchaseOrderDetail from "../purchase/views/purchaseOrderDetail"
+import refundList from "../purchase/views/refundList"
+import refundListDetail from "../purchase/components/refundListDetail"
+import refundOlder from "../purchase/components/refundOlder"
 
 // 供应商类
 import supplierList from "../supplier/views/supplierList"
@@ -158,6 +161,9 @@ export default {
         purchaseOrderList,
         addQuoteList,
         purchaseOrderDetail,
+        refundList,
+        refundListDetail,
+        refundOlder,
         
         storeList,
         addStoreInfo,
@@ -177,7 +183,6 @@ export default {
         // 菜单是否展开
         isExpand () {
             console.log(1);
-            
         },
         // 退出登陆
         logout () {

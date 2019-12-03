@@ -18,6 +18,7 @@
                     <el-table-column width="250" label="操作">
                         <template slot-scope="scope">
                             <el-button @click="distPostFn(scope.row)" type="text" size="small">分配权限</el-button>
+                            <el-button @click="delRoletFn(scope.row)" type="text" size="small">删除角色</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -83,6 +84,37 @@ export default {
         this.getRoleListFn();
     },
     methods: {
+        // 删除角色
+        delRoletFn (item) {
+            let token = window.sessionStorage.getItem("gn_request_token");
+            this.$confirm('你确定将删除此角色吗?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(async () => {
+                let paramObj = {
+                    Token: token,
+                    ID: item.roleID
+                    // ID: item.id0
+                }
+                var res = await this.postData("A1015", paramObj);
+
+                console.log(res);
+                this.$message({
+                    type: 'success',
+                    message: '删除成功!'
+                });
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });
+            });
+
+
+
+        },
+        // 跳转到权限管理分配权限
         distPostFn () {
             let data = {
                 menuName: '权限管理',
@@ -93,7 +125,7 @@ export default {
         // 添加权限弹出框
         // async addPostDialogFn (item) {
         //     this.getMenuListFn();
-            // let token = window.sessionStorage.getItem("gn_request_token");
+        // let token = window.sessionStorage.getItem("gn_request_token");
         //     this.addPostObj.addPostValue = item.roleName;
         //     this.addPostObj.roleID = item.roleID;
 

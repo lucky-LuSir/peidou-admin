@@ -55,11 +55,18 @@
                     </div>
                     <div class="comInfo-content">
                         <div class="inline">
-                            <el-radio-group v-model="addQuoteForm.InvoiceType">
+                            <el-form-item label="发票：" prop="InvoiceType">
+                                <el-radio-group v-model="addQuoteForm.InvoiceType">
+                                    <el-radio :label="1">无票</el-radio>
+                                    <el-radio :label="2">普票</el-radio>
+                                    <el-radio :label="3">专票</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                            <!-- <el-radio-group v-model="addQuoteForm.InvoiceType">
                                 <el-radio :label="1">无票</el-radio>
                                 <el-radio :label="2">普票</el-radio>
                                 <el-radio :label="3">专票</el-radio>
-                            </el-radio-group>
+                            </el-radio-group> -->
                         </div>
                         <div class="inline">
                             <el-form-item label="供应商：" prop="supplierIDValue">
@@ -187,7 +194,7 @@ export default {
                 logName: '', // 物流名称
                 addValue: '', // 物流地址
                 isHangAccout: 1, // 是否挂账
-                InvoiceType: 1, // 发票类型
+                InvoiceType: '', // 发票类型
                 supplierName: '', // 供应商
                 lastDate: '', // 最后付款
                 supplierIDValue: '',
@@ -224,6 +231,9 @@ export default {
                 addValue: [
                     { required: true, message: '请输入物流地址', trigger: 'change' },
                 ],
+                InvoiceType: [
+                    { required: true, message: '请选择发票类型', trigger: 'change' },
+                ],
             },
             storeList: [],
             state1: '',
@@ -242,27 +252,27 @@ export default {
             editPartsList: [],
             specificationList: [
                 {
-                    value: '2',
+                    value: 2,
                     label: '品牌件'
                 },
                 {
-                    value: '1',
+                    value: 1,
                     label: '原厂件'
                 },
                 {
-                    value: '3',
+                    value: 3,
                     label: '拆车件'
                 },
                 {
-                    value: '6',
+                    value: 6,
                     label: '再制造'
                 },
                 {
-                    value: '5',
+                    value: 5,
                     label: '无限制'
                 },
                 {
-                    value: '4',
+                    value: 4,
                     label: '其他'
                 },
             ],

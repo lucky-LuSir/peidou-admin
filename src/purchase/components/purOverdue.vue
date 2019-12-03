@@ -1,6 +1,6 @@
 <template>
     <!-- 已逾期 -->
-    <el-popover class="root">
+    <div class="root">
         <div class="header">
             <div class="info clearfix">
                 <div class="quoteNum fl">
@@ -11,7 +11,7 @@
                 </div>
             </div>
         </div>
-        <el-popover class="main">
+        <div class="main">
             <div class="logistics">
                 <div class="comInfo-top" style="display: flex;">
                     <h2>物流信息</h2>
@@ -31,21 +31,18 @@
                     </div>
                 </div>
             </div>
-            <el-popover class="pinzhengInfo">
+            <div class="pinzhengInfo">
                 <div class="comInfo-top">
                     <h2>物流凭证</h2>
                 </div>
                 <div class="comInfo-content clearfix">
-                    <!-- <div class="imgs" v-for="(item, index) in IMGS" :key="index">
-                        <img style="width: 100px; height: 60px; margin-right: 10px;" :src="item" alt="">
-                    </div> -->
                     <div>
                         <viewer :images="IMGS">
                             <img v-for="src in IMGS" :src="src" :key="src" width="50">
                         </viewer>
                     </div>
                 </div>
-            </el-popover>
+            </div>
             <div class="parts">
                 <div class="parts-top clearfix">
                     <div class="parts-title fl">
@@ -110,6 +107,9 @@
                         </div>
                     </div>
                 </div>
+                <div style="width: 1024px; text-align: center;" class="refundBtn">
+                    <el-button @click="applyRefundFn()" type="primary" style="width: 300px; margin: 30px 0;">申请退货</el-button>
+                </div>
             </div>
             <div class="carInfo">
                 <div class="comInfo-top">
@@ -163,7 +163,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="invoice">
                 <div class="comInfo-top">
                     <h2>发票信息</h2>
@@ -174,8 +173,8 @@
                     <p v-if="quoteForm.invoiceType == 3">无票</p>
                 </div>
             </div>
-        </el-popover>
-    </el-popover>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -204,6 +203,7 @@ export default {
                 isAccounts: "1"
             },
             IMGS: [],
+            maxNum: 100,
         }
     },
     created () {
@@ -212,6 +212,59 @@ export default {
         this.getDetailFn();
     },
     methods: {
+        // 申请退货
+        applyRefundFn () {
+            if (this.multipleSelection.length <= 0) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择要退货商品!"
+                })
+                return;
+            }
+            let myObj = [];
+            for (let i = 0; i < this.multipleSelection.length; i++) {
+                myObj.push({
+                    ComponentID: this.multipleSelection[i].componentID,
+                    quantity: this.multipleSelection[i].quantity
+                })
+            }
+            this.$confirm('你确定申请退货吗?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(async () => {
+                let token = window.sessionStorage.getItem("gn_request_token");
+                let paramObj = {
+                    Token: token,
+                    RefundComponentData: myObj
+                }
+                let res = await this.postData("A1054", paramObj);
+                if (res.code == 0) {
+                    this.$message({
+                        type: 'success',
+                        message: res.res.msg
+                    });
+                    let data = {
+                        menuName: '退货管理',
+                        item: 'refundList',
+                    };
+                    this.$emit('purBack', data);
+                }
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消'
+                });
+            });
+        },
+        // 选择表格
+        handleSelectionChange (val) {
+            console.log(val);
+            this.multipleSelection = val;
+        },
+        // 计数器
+        handleChange (value) {
+        },
         async getDetailFn () {
             let token = window.sessionStorage.getItem("gn_request_token");
             let paramObj = {
@@ -233,6 +286,8 @@ export default {
             if (this.quoteForm.expressIMG) {
                 this.IMGS = JSON.parse(this.quoteForm.expressIMG);
             }
+            console.log(this.quoteForm);
+
         },
     },
 }

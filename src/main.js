@@ -49,7 +49,6 @@ Vue.prototype.$cookieStore = {
 
 Vue.filter("ToFixed", function (value) {
     if (value) {
-        console.log(value);
         return value.toFixed(2);
     }
 });

@@ -1,5 +1,5 @@
 <template>
-    <!-- 已发送 -->
+    <!-- 已结算 -->
     <div class="root">
         <div class="header">
             <div class="info clearfix">
@@ -36,10 +36,6 @@
                     <h2>物流凭证</h2>
                 </div>
                 <div class="comInfo-content clearfix">
-                    <!-- <img src="" alt=""> -->
-                    <!-- <div class="imgs" v-for="(item, index) in IMGS" :key="index">
-                        <img style="width: 100px; height: 60px; margin-right: 10px;" :src="item" alt="">
-                    </div> -->
                     <div>
                         <viewer :images="IMGS">
                             <img v-for="src in IMGS" :src="src" :key="src" width="50">
@@ -97,7 +93,7 @@
                             </template>
                         </el-table-column>
                         <el-table-column prop="servicePrice" label="退货费率" width="120">
-                           <template slot-scope="scope">
+                            <template slot-scope="scope">
                                 <span v-if="scope.row.servicePrice == 0.05">5%</span>
                                 <span v-if="scope.row.servicePrice == 0">不可退货</span>
                             </template>
@@ -111,6 +107,9 @@
                             合计: {{ totalprice | ToFixed }}
                         </div>
                     </div>
+                </div>
+                <div style="width: 1024px; text-align: center;" class="refundBtn">
+                    <el-button @click="applyRefundFn()" type="primary" style="width: 300px; margin: 30px 0;">申请退货</el-button>
                 </div>
             </div>
             <div class="carInfo">
@@ -165,7 +164,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="invoice">
                 <div class="comInfo-top">
                     <h2>发票信息</h2>
@@ -206,6 +204,7 @@ export default {
                 isAccounts: "1"
             },
             IMGS: [],
+            maxNum: 100,
         }
     },
     created () {
@@ -214,6 +213,60 @@ export default {
         this.getDetailFn();
     },
     methods: {
+        // 申请退货
+        applyRefundFn () {
+            if (this.multipleSelection.length <= 0) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择要退货商品!"
+                })
+                return;
+            }
+            let myObj = [];
+            for (let i = 0; i < this.multipleSelection.length; i++) {
+                myObj.push({
+                    ComponentID: this.multipleSelection[i].componentID,
+                    quantity: this.multipleSelection[i].quantity
+                })
+            }
+            this.$confirm('你确定申请退货吗?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(async () => {
+                let token = window.sessionStorage.getItem("gn_request_token");
+                let paramObj = {
+                    Token: token,
+                    RefundComponentData: myObj
+                }
+                let res = await this.postData("A1054", paramObj);
+                if (res.code == 0) {
+                    this.$message({
+                        type: 'success',
+                        message: res.res.msg
+                    });
+                    
+                    let data = {
+                        menuName: '退货管理',
+                        item: 'refundList',
+                    };
+                    this.$emit('purBack', data);
+                }
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消'
+                });
+            });
+        },
+        // 选择表格
+        handleSelectionChange (val) {
+            console.log(val);
+            this.multipleSelection = val;
+        },
+        // 计数器
+        handleChange (value) {
+        },
         async getDetailFn () {
             let token = window.sessionStorage.getItem("gn_request_token");
             let paramObj = {
@@ -221,8 +274,6 @@ export default {
                 InquiryID: this.inquiryID
             }
             let res = await this.postData("A1044", paramObj);
-            console.log(res);
-
             let result = res.res.data;
 
             this.tableData = result.inquiryComponents;

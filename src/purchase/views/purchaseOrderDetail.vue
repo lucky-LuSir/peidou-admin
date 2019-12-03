@@ -1,10 +1,10 @@
 <template>
     <!-- 询价订单主页面 -->
     <div class="root">
-        <purAlreadySend v-if="quoteStatus == 4"></purAlreadySend>
-        <purAwaitSend v-if="quoteStatus == 1"></purAwaitSend>
-        <purOverdue v-if="quoteStatus == 3"></purOverdue>
-        <purSettlement v-if="quoteStatus == 2"></purSettlement>
+        <purAwaitSend @purBack="purBack($event)" v-if="quoteStatus == 1"></purAwaitSend>
+        <purSettlement @purBack="purBack($event)" v-if="quoteStatus == 2"></purSettlement>
+        <purOverdue @purBack="purBack($event)" v-if="quoteStatus == 3"></purOverdue>
+        <purAlreadySend @purBack="purBack($event)" v-if="quoteStatus == 4"></purAlreadySend>
     </div>
 </template>
 
@@ -28,13 +28,10 @@ export default {
     },
     created () {
         let purInfoObj = JSON.parse(window.sessionStorage.getItem("purInfoObj"))
-        console.log(purInfoObj);
         
         if (purInfoObj) {
-            if (purInfoObj.inquiryState == 1 && purInfoObj.expressState == 1) {
+            if (purInfoObj.inquiryState == 1) {
                 this.quoteStatus = 1; // 挂账中待发货
-            } else if (purInfoObj.inquiryState == 1 && purInfoObj.expressState == 1) {
-                this.quoteStatus = 4; // 挂账中待发货
             } else if (purInfoObj.inquiryState == 2) {
                 this.quoteStatus = 2; // 已结算
             } else if (purInfoObj.inquiryState == 3) {
@@ -44,6 +41,8 @@ export default {
     },
     methods: {
         purBack (val) {
+            console.log(val);
+            
             this.$emit('backParam', val);
         }
     },

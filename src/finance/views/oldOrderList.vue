@@ -194,7 +194,6 @@ export default {
     created () {
         let financeId = window.sessionStorage.getItem("financeId");
         this.inquiryID = financeId;
-        
         this.getDetailFn();
     },
     methods: {

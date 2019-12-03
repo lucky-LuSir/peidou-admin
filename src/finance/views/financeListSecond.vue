@@ -165,8 +165,6 @@ export default {
     },
     created () {
         this.getFinanceList();
-        // this.dateValue = window.sessionStorage.getItem("PayDatetime");
-        // console.log(this.dateValue);
     },
     methods: {
         // 支付方式
@@ -310,7 +308,6 @@ export default {
                 pageIndex: 1,
             }
             const res = await this.postData("A1035", paramObj);
-            // const res = await this.postData("A1037", paramObj);
             let result = res.res.data;
             console.log(result);
             this.totalNum = result.count;
